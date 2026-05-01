@@ -1,0 +1,122 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useCartStore } from "@/lib/store";
+import { PRODUCTS, UPSELL_PRICE } from "@/data/products";
+import { trackPurchase } from "@/lib/pixels";
+
+const COUNTDOWN_SECONDS = 12;
+
+export function UpsellModal() {
+  const { items, isUpsellOpen, closeUpsell } = useCartStore();
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+
+  const cartSkus = new Set(items.map((i) => i.product.sku));
+  const upsellProduct = PRODUCTS.find((p) => !cartSkus.has(p.sku));
+
+  useEffect(() => {
+    if (!isUpsellOpen) {
+      setCountdown(COUNTDOWN_SECONDS);
+      return;
+    }
+    const interval = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(interval);
+          handleDecline();
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUpsellOpen]);
+
+  const finalize = async (accepted: boolean) => {
+    closeUpsell();
+    const raw = sessionStorage.getItem("pending_order");
+    if (!raw) return;
+
+    const payload = {
+      ...JSON.parse(raw),
+      upsell_accepted: accepted,
+      upsell_sku: accepted && upsellProduct ? upsellProduct.sku : undefined,
+    };
+
+    // Fire Purchase pixel
+    const skus = payload.items.map((i: { sku: string }) => i.sku);
+    if (accepted && upsellProduct) skus.push(upsellProduct.sku);
+    const value = payload.total + (accepted ? UPSELL_PRICE : 0);
+    trackPurchase(payload.event_id, value, skus);
+
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+    } catch { /* silent */ }
+
+    useCartStore.getState().clearCart();
+    window.location.href = "/thank-you";
+  };
+
+  const handleAccept = () => finalize(true);
+  const handleDecline = () => finalize(false);
+
+  if (!isUpsellOpen || !upsellProduct) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/70 z-60 flex items-end md:items-center justify-center p-0 md:p-4">
+      <div className="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-2xl p-6 space-y-5">
+        {/* Countdown bar */}
+        <div className="relative h-1.5 bg-navy/10 rounded-full overflow-hidden">
+          <div
+            className="absolute top-0 right-0 h-full bg-gold transition-all duration-1000"
+            style={{ width: `${(countdown / COUNTDOWN_SECONDS) * 100}%` }}
+          />
+        </div>
+        <p className="text-center text-xs text-navy/40 font-medium">
+          ينتهي العرض خلال {countdown} ثانية
+        </p>
+
+        {/* Header */}
+        <div className="text-center space-y-1">
+          <p className="text-sm font-bold text-gold uppercase tracking-wide">
+            عرض خاص مرة واحدة فقط
+          </p>
+          <h3 className="font-extrabold text-navy text-2xl leading-snug">
+            أضيفي {upsellProduct.shortAr}
+          </h3>
+          <p className="text-navy/60 text-sm">{upsellProduct.descriptionAr}</p>
+        </div>
+
+        {/* Price */}
+        <div className="text-center">
+          <p className="text-navy/40 line-through text-lg">199 ر.س</p>
+          <p className="text-4xl font-black text-gold">
+            {UPSELL_PRICE} <span className="text-2xl">ر.س</span>
+          </p>
+          <p className="text-green-600 text-sm font-bold mt-1">وفّري 100 ر.س الآن</p>
+        </div>
+
+        {/* Buttons */}
+        <div className="space-y-3">
+          <button onClick={handleAccept} className="btn-gold w-full text-lg py-4">
+            نعم، أريدها بـ {UPSELL_PRICE} ر.س
+          </button>
+          <button
+            onClick={handleDecline}
+            className="w-full text-navy/40 text-sm font-medium py-2 hover:text-navy/60 transition-colors"
+          >
+            لا شكراً، لست مهتمة
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

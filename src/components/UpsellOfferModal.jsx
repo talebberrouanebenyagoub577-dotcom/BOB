@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { getActiveCopy } from "../content/copyByVariant";
+import { useEffect, useState } from "react";
 import { getUpsellPrice } from "../lib/pricing";
 
 export default function UpsellOfferModal({
@@ -10,65 +9,84 @@ export default function UpsellOfferModal({
   onReject,
 }) {
   const [secondsLeft, setSecondsLeft] = useState(countdownSeconds);
+  const [accepted, setAccepted] = useState(false);
   const upsellPrice = getUpsellPrice();
-  const copy = getActiveCopy();
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (!isOpen) return;
     setSecondsLeft(countdownSeconds);
-    return undefined;
+    setAccepted(false);
   }, [isOpen, countdownSeconds]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
-    if (secondsLeft <= 0) {
-      onReject();
-      return undefined;
+    if (!isOpen || secondsLeft <= 0) {
+      if (isOpen && secondsLeft <= 0) onReject();
+      return;
     }
-
-    const timer = window.setTimeout(() => {
-      setSecondsLeft((current) => current - 1);
-    }, 1000);
-
-    return () => window.clearTimeout(timer);
+    const t = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(t);
   }, [isOpen, secondsLeft, onReject]);
 
-  const headline = useMemo(() => {
-    if (!offerProduct) return "";
-    return copy.upsell.headline(offerProduct.name);
-  }, [offerProduct, copy]);
+  const handleAccept = () => {
+    if (accepted) return;
+    setAccepted(true);
+    onAccept();
+  };
+
+  if (!isOpen && !offerProduct) return null;
 
   return (
     <>
       <div className={`popup-overlay ${isOpen ? "visible" : ""}`} aria-hidden={!isOpen} />
-      <section className={`upsell-modal ${isOpen ? "open" : ""}`}>
-        <div className="upsell-shell">
-          <p className="upsell-badge">{copy.upsell.badge}</p>
-          <h2>{headline}</h2>
-          <p className="muted">{copy.upsell.description(upsellPrice)}</p>
+      <section className={`upsell-modal ${isOpen ? "open" : ""}`} role="dialog" aria-modal="true">
+        <div className="upsell-inner">
+          <div className="upsell-badge">⚡ عرض حصري لطلبك فقط</div>
+
+          <h2 className="upsell-title">
+            أضف {offerProduct?.name} لطلبك الحالي بسعر خاص!
+          </h2>
+          <p className="upsell-sub">
+            هذا العرض متاح لمرة واحدة فقط قبل إتمام طلبك — لن يتكرر بعد ذلك.
+          </p>
 
           {offerProduct && (
-            <article className="upsell-product">
-              <img src={offerProduct.image} alt={offerProduct.name} />
+            <div className="upsell-product-row">
+              <img
+                className="upsell-product-img"
+                src={offerProduct.image}
+                alt={offerProduct.name}
+              />
               <div>
-                <strong>{offerProduct.name}</strong>
-                <p>{offerProduct.shortBenefit}</p>
+                <p className="upsell-product-name">{offerProduct.name}</p>
+                <p className="upsell-product-benefit">{offerProduct.shortBenefit}</p>
                 <div className="upsell-price-row">
-                  <span className="strikethrough">{offerProduct.price} SAR</span>
-                  <strong>{upsellPrice} SAR</strong>
+                  <span className="upsell-old-price">{offerProduct.price} ر.س</span>
+                  <span className="upsell-new-price">{upsellPrice} ر.س</span>
+                  <span className="upsell-save">وفّر {offerProduct.price - upsellPrice} ر.س</span>
                 </div>
               </div>
-            </article>
+            </div>
           )}
 
-          <p className="upsell-timer">{copy.upsell.timer(secondsLeft)}</p>
+          <div className="upsell-timer">
+            ينتهي العرض خلال: <span>{secondsLeft}</span> ثانية
+          </div>
 
           <div className="upsell-actions">
-            <button className="primary-btn" type="button" onClick={onAccept}>
-              أضف إلى طلبي
+            <button
+              className="btn btn-gold btn-full btn-lg"
+              type="button"
+              onClick={handleAccept}
+              disabled={accepted}
+            >
+              {accepted ? "⏳ جاري الإضافة..." : `أضف للطلب — ${upsellPrice} ر.س فقط`}
             </button>
-            <button className="ghost-btn" type="button" onClick={onReject}>
-              لا، شكرًا
+            <button
+              className="btn btn-ghost btn-full"
+              type="button"
+              onClick={onReject}
+            >
+              لا شكراً، أكمل بدونه
             </button>
           </div>
         </div>

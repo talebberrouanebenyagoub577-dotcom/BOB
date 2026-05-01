@@ -1,0 +1,23 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    DATABASE_URL: str = "postgresql+asyncpg://nidhamauto:nidhamauto@localhost:5432/nidhamauto"
+
+    META_ACCESS_TOKEN: str = ""
+    META_PIXEL_ID: str = ""
+    META_TEST_EVENT_CODE: str = ""
+
+    TIKTOK_ACCESS_TOKEN: str = ""
+    TIKTOK_PIXEL_ID: str = ""
+
+    SNAP_ACCESS_TOKEN: str = ""
+    SNAP_PIXEL_ID: str = ""
+
+    GOOGLE_SHEET_WEBHOOK: str = ""
+    SECRET_KEY: str = "change-me"
+
+
+settings = Settings()

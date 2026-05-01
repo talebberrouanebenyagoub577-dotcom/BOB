@@ -1,120 +1,114 @@
-import { useEffect, useMemo, useState } from "react";
-import { getActiveCopy } from "../content/copyByVariant";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-const RESERVATION_SECONDS = 10 * 60;
-
-function formatTime(seconds) {
-  const safeSeconds = Math.max(0, seconds);
-  const minutes = Math.floor(safeSeconds / 60);
-  const remaining = safeSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
-}
+const STEPS = [
+  "فريقنا سيتصل بك قريباً لتأكيد طلبك",
+  "سيتم شحن طلبك بعد التأكيد مباشرة",
+  "الطلب يصلك خلال 2-5 أيام عمل",
+  "الدفع نقداً للمندوب عند الاستلام",
+];
 
 export default function ThankYouPage({ order }) {
   if (!order) return null;
-  const copy = getActiveCopy();
 
   const maskedPhone =
-    order.phone?.length >= 4
+    order.phone?.length >= 7
       ? `${order.phone.slice(0, 3)}****${order.phone.slice(-3)}`
       : order.phone;
-  const [secondsLeft, setSecondsLeft] = useState(RESERVATION_SECONDS);
+
+  const [countdown, setCountdown] = useState(10 * 60);
 
   useEffect(() => {
-    if (secondsLeft <= 0) return undefined;
+    if (countdown <= 0) return;
+    const t = setInterval(() => setCountdown((c) => (c > 0 ? c - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [countdown]);
 
-    const timer = window.setInterval(() => {
-      setSecondsLeft((current) => (current > 0 ? current - 1 : 0));
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [secondsLeft]);
-
-  const isReservationActive = secondsLeft > 0;
-  const reservationMessage = useMemo(() => {
-    if (isReservationActive) {
-      return copy.thankYou.reservationActive(formatTime(secondsLeft));
-    }
-    return copy.thankYou.reservationExpired;
-  }, [isReservationActive, secondsLeft, copy]);
+  const mins = String(Math.floor(countdown / 60)).padStart(2, "0");
+  const secs = String(countdown % 60).padStart(2, "0");
 
   return (
-    <main className="thank-you">
-      <section className="thank-you-card">
-        <p className="thank-you-badge">تم تسجيل الطلب في النظام</p>
-        <h1>تم استلام طلبك بنجاح</h1>
-        <p>
-          شكرًا لك يا {order.customerName}. سيتم الاتصال بك قريبًا على{" "}
-          <strong className="ltr-inline">{maskedPhone}</strong> لتأكيد بيانات التوصيل.
-        </p>
-        <p className="call-trust-line">
-          سيتم الاتصال بك قريبًا لتأكيد الطلب.
-          <span className="micro-en">Our team will call you shortly to confirm your order.</span>
-        </p>
-        <p className="cod-reassurance">
-          {copy.thankYou.reassurance}
-          <span className="micro-en">Your order is secured and processing starts quickly.</span>
-        </p>
-
-        <section className="reservation-status" aria-live="polite">
-          <p>{reservationMessage}</p>
-          {isReservationActive && (
-            <strong className="reservation-timer ltr-inline">{formatTime(secondsLeft)}</strong>
-          )}
-        </section>
-
-        <div className="trust-row">
-          <span>الدفع عند الاستلام</span>
-          <span>توصيل لجميع مناطق السعودية</span>
-          <span>خدمة عملاء سريعة</span>
+    <main className="thankyou-page">
+      <div className="thankyou-card">
+        {/* Header */}
+        <div className="thankyou-header">
+          <div className="success-icon">✅</div>
+          <h1>تم استلام طلبك!</h1>
+          <p>شكراً لك يا {order.customerName} — طلبك في قائمة المعالجة.</p>
         </div>
 
-        <section className="urgent-box">
-          <h3>{copy.thankYou.urgentTitle}</h3>
-          <p>{copy.thankYou.urgentBody}</p>
-          <p className="urgent-subline">{copy.thankYou.urgentSubline}</p>
-        </section>
+        <div className="thankyou-body">
+          {/* Phone reminder */}
+          <div className="phone-reminder">
+            <h4>📞 خلّي جوالك قريب!</h4>
+            <p>
+              سنتصل على الرقم{" "}
+              <span className="masked-phone">{maskedPhone}</span>{" "}
+              قريباً لتأكيد الطلب وتحديد موعد التوصيل.
+            </p>
+            {countdown > 0 && (
+              <p style={{ marginTop: 8, fontWeight: 700, color: "#92400E" }}>
+                الحجز نشط لمدة: <span style={{ fontFamily: "monospace", fontSize: 16, color: "#DC2626" }}>{mins}:{secs}</span>
+              </p>
+            )}
+          </div>
 
-        <section className="next-steps">
-          <h3>الخطوات القادمة</h3>
-          <ol>
-            <li>مكالمة تأكيد سريعة من فريقنا.</li>
-            <li>مراجعة العنوان بشكل واضح (الحي، الشارع، رقم المنزل).</li>
-            <li>التوصيل خلال 2–5 أيام عمل مع تحديد وقت مناسب.</li>
-            <li>التوصيل والدفع عند الاستلام بدون دفع مسبق.</li>
-          </ol>
-        </section>
+          {/* Next steps */}
+          <div className="next-steps">
+            <h3>الخطوات القادمة</h3>
+            <div className="step-list">
+              {STEPS.map((step, i) => (
+                <div key={i} className="step-item">
+                  <div className="step-num-circle">{i + 1}</div>
+                  <p>{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        <h3>
-          ملخص الطلب
-          <span className="micro-en">Order Summary</span>
-        </h3>
-        <ul className="thank-you-list">
-          {order.items.map((item) => (
-            <li key={item.id}>
-              <span>
-                {item.name} x{item.quantity}
-              </span>
-              <strong>{item.lineTotal} SAR</strong>
-            </li>
-          ))}
-          {order.upsellAccepted && order.upsellProduct && (
-            <li>
-              <span>{order.upsellProduct.name} (عرض لمرة واحدة)</span>
-              <strong>{order.upsellPrice} SAR</strong>
-            </li>
-          )}
-        </ul>
-        <div className="summary-total">
-          <span>الإجمالي</span>
-          <strong>{order.total} SAR</strong>
+          {/* Order summary */}
+          <div className="order-summary-ty">
+            <h3>ملخص طلبك</h3>
+            {order.items.map((item) => (
+              <div key={item.id} className="order-line">
+                <span className="order-line-name">
+                  {item.name} × {item.quantity}
+                </span>
+                <span className="order-line-price">{item.lineTotal} ر.س</span>
+              </div>
+            ))}
+            {order.upsellAccepted && order.upsellProduct && (
+              <div className="order-line">
+                <span className="order-line-name">{order.upsellProduct.name} (عرض خاص)</span>
+                <span className="order-line-price">{order.upsellPrice} ر.س</span>
+              </div>
+            )}
+            <div className="order-total-row">
+              <span>الإجمالي</span>
+              <strong>{order.total} ر.س</strong>
+            </div>
+          </div>
+
+          {/* Trust chips */}
+          <div className="ty-trust">
+            <div className="ty-chip green">✓ الدفع عند الاستلام</div>
+            <div className="ty-chip green">✓ توصيل 2-5 أيام</div>
+            <div className="ty-chip green">✓ إرجاع مجاني 7 أيام</div>
+          </div>
+
+          {/* Order ID */}
+          <p style={{ fontSize: 13, color: "var(--gray-400)", textAlign: "center" }}>
+            رقم الطلب:{" "}
+            <strong style={{ color: "var(--navy)", fontFamily: "monospace" }}>
+              {order.orderId ?? "N/A"}
+            </strong>
+          </p>
+
+          <Link to="/collection" className="btn btn-navy btn-full" style={{ textAlign: "center" }}>
+            تصفّح المزيد من المنتجات
+          </Link>
         </div>
-
-        <p className="thank-you-help">
-          تحتاج مساعدة في الطلب؟ تواصل مع الدعم وشارك رقم الطلب:{" "}
-          <strong>{order.orderId || order.order_id || "N/A"}</strong>
-        </p>
-      </section>
+      </div>
     </main>
   );
 }

@@ -1,8 +1,8 @@
 export const PRICING_CONFIG = {
   products: {
-    "phone-mount": 109,
-    "seatgap-organizer": 99,
-    "parking-mirror-kit": 89,
+    "seat-organizer":    199,
+    "seatgap-protector": 199,
+    "parking-mirror":    199,
   },
   bundleTiers: [
     { units: 3, price: 349 },
