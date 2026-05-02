@@ -29,8 +29,7 @@ async def startup() -> None:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables ensured.")
     except Exception as e:
-        logger.error(f"STARTUP ERROR — DB connection failed: {e}")
-        raise
+        logger.error(f"DB connection failed (will retry on first request): {e}")
 
 
 @app.get("/health")
