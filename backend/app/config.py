@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    DATABASE_URL: str = "postgresql+asyncpg://nidhamauto:auto.shop@organisat_databes:5432/nidhamauto"
+    DATABASE_URL: str = "postgresql+asyncpg://nidhamauto:auto.shop@databes:5432/nidhamauto"
 
     META_ACCESS_TOKEN: str = ""
     META_PIXEL_ID: str = ""

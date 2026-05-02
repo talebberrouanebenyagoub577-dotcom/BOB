@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const backendUrl = "http://backend:8000";
+const backendUrl = "http://backend:8000";  // try also: organisat_backend, organisat-backend
 
 const nextConfig = {
   output: "standalone",
