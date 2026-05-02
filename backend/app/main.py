@@ -22,8 +22,28 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup() -> None:
     """Auto-run migrations on startup."""
+    import asyncpg
+    candidates = [
+        "databes",
+        "organisat_databes",
+        "organisat-databes",
+    ]
+    logger.info("Testing DB hostnames...")
+    for host in candidates:
+        try:
+            conn = await asyncpg.connect(
+                host=host, port=5432,
+                user="nidhamauto", password="auto.shop",
+                database="nidhamauto", timeout=3,
+            )
+            await conn.close()
+            logger.info(f"SUCCESS — DB reachable at host: {host}")
+            break
+        except Exception as e:
+            logger.warning(f"FAIL {host}: {e}")
+
     from app.config import settings
-    logger.info(f"Connecting to DB: {settings.DATABASE_URL[:40]}...")
+    logger.info(f"Connecting to DB: {settings.DATABASE_URL[:50]}...")
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
