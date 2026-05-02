@@ -2,9 +2,12 @@ import random
 import string
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from app.config import settings
 from app.database import get_db
 from app.models.order import Order, OrderItem
 from app.schemas.order import OrderIn, OrderOut
@@ -76,3 +79,39 @@ async def create_order(
     )
 
     return OrderOut(order_id=order.id, order_number=order_number)
+
+
+@router.get("/admin/orders")
+async def list_orders(
+    token: str = Query(...),
+    limit: int = Query(50, le=200),
+    db: AsyncSession = Depends(get_db),
+):
+    if token != settings.SECRET_KEY:
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.items))
+        .order_by(desc(Order.created_at))
+        .limit(limit)
+    )
+    orders = result.scalars().all()
+
+    return [
+        {
+            "order_number": o.order_number,
+            "name": o.name,
+            "phone": o.phone,
+            "total": o.total,
+            "status": o.status,
+            "upsell_accepted": o.upsell_accepted,
+            "upsell_sku": o.upsell_sku,
+            "items": [
+                {"sku": i.sku, "qty": i.qty, "unit_price": i.unit_price}
+                for i in o.items
+            ],
+            "created_at": o.created_at.isoformat(),
+        }
+        for o in orders
+    ]
