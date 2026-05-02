@@ -37,4 +37,21 @@ async def health() -> dict:
     return {"status": "ok"}
 
 
+@app.get("/admin/diagnose")
+async def diagnose() -> dict:
+    import socket
+    hosts = [
+        "databes", "organisat_databes", "organisat-databes",
+        "nidhamauto_database", "host.docker.internal", "172.17.0.1",
+    ]
+    results = {}
+    for host in hosts:
+        try:
+            ip = socket.gethostbyname(host)
+            results[host] = f"OK → {ip}"
+        except Exception as e:
+            results[host] = f"FAIL: {e}"
+    return results
+
+
 app.include_router(orders_router)
