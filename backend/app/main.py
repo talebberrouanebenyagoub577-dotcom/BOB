@@ -13,7 +13,7 @@ app = FastAPI(title="Nidha Mauto API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten in production to nidhamauto.shop
+    allow_origins=["https://nidhamauto.shop"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
