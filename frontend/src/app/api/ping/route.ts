@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
 const HOSTS = [
-  "http://backend:8000",
+  "http://organisat_backend:80",
   "http://organisat_backend:8000",
-  "http://organisat-backend:8000",
+  "http://backend:80",
+  "http://backend:8000",
 ];
 
 export async function GET() {
