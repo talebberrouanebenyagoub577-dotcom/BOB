@@ -25,7 +25,7 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "DATABASE_URL=postgresql+asyncpg://postgres:$(DB_PASSWORD)@$(PROJECT_NAME)_db:5432/$(PROJECT_NAME)\nSECRET_KEY=$(SECRET_KEY)\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nMETA_TEST_EVENT_CODE=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=\nGOOGLE_SHEET_WEBHOOK=",
+        "env": "DATABASE_URL=postgresql+asyncpg://nidhamauto:$(DB_PASSWORD)@organisat_databes:5432/nidhamauto\nSECRET_KEY=$(SECRET_KEY)\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nMETA_TEST_EVENT_CODE=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=\nGOOGLE_SHEET_WEBHOOK=",
         "domains": [
           {
             "host": "api.$(EASYPANEL_DOMAIN)",
@@ -50,7 +50,7 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "NEXT_PUBLIC_API_URL=https://api.$(EASYPANEL_DOMAIN)\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
+        "env": "NEXT_PUBLIC_API_URL=https://api.$(EASYPANEL_DOMAIN)\nNEXT_PUBLIC_ENABLE_PIXELS=true\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
         "domains": [
           {
             "host": "$(EASYPANEL_DOMAIN)",
