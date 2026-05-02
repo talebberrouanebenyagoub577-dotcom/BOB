@@ -22,9 +22,15 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup() -> None:
     """Auto-run migrations on startup."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database tables ensured.")
+    from app.config import settings
+    logger.info(f"Connecting to DB: {settings.DATABASE_URL[:40]}...")
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables ensured.")
+    except Exception as e:
+        logger.error(f"STARTUP ERROR — DB connection failed: {e}")
+        raise
 
 
 @app.get("/health")
