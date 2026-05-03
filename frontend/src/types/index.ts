@@ -8,10 +8,15 @@ export interface Product {
   sku: string;
   nameAr: string;
   shortAr: string;
+  shortBenefit: string;
   descriptionAr: string;
   price: number; // base (1 unit)
   image: string;
   benefits: string[];
+  badge?: string;
+  reviewCount: number;
+  rating: number;
+  stock: number;
 }
 
 export interface PriceTier {

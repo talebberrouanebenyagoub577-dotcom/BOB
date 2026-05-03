@@ -6,6 +6,40 @@ import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { PRODUCTS } from "@/data/products";
 
+const REVIEWS = [
+  {
+    name: "نورة م.",
+    city: "الرياض",
+    initial: "ن",
+    product: "المنظّم الذكي للمقعد",
+    text: "المنظّم غيّر حياتي. سيارتي كانت فوضى وكنت أخجل من أي راكب. الحين كل شيء له مكان والسيارة تبيّن شخصيتي.",
+    stars: 5,
+  },
+  {
+    name: "سارة ع.",
+    city: "جدة",
+    initial: "س",
+    product: "حامي فراغ المقعد",
+    text: "كل يوم أدور مفاتيحي في نفس الفتحة الملعونة. بعد الحامي — صفر مشاكل. اشتريت نسخة ثانية لسيارة أهلي.",
+    stars: 5,
+  },
+  {
+    name: "ريم ا.",
+    city: "الدمام",
+    initial: "ر",
+    product: "طقم مرايا الاصطفاف الدقيق",
+    text: "موقف العمل ضيق وكنت أتوتر كل يوم. بعد طقم المرايا صرت أصطف بثقة. النتيجة من أول يوم والمواد قوية جداً.",
+    stars: 5,
+  },
+];
+
+const FAQS = [
+  { q: "هل الدفع عند الاستلام فقط؟", a: "نعم، جميع طلباتنا بالدفع عند الاستلام. لا حاجة لبطاقة ائتمانية أو دفع إلكتروني مسبق." },
+  { q: "كم يستغرق التوصيل؟", a: "2-5 أيام عمل لمعظم مناطق المملكة. الرياض وجدة والدمام عادةً 2-3 أيام." },
+  { q: "هل يمكنني إرجاع المنتج؟", a: "نعم، نقبل الإرجاع خلال 7 أيام من تاريخ الاستلام إذا كان المنتج في حالته الأصلية." },
+  { q: "هل المنتجات مناسبة لجميع السيارات؟", a: "نعم، منتجاتنا مصممة لتناسب معظم سيارات السيدان والـ SUV الشائعة في السعودية." },
+];
+
 export default function HomePage() {
   return (
     <>
@@ -16,38 +50,55 @@ export default function HomePage() {
 
       <main>
         {/* Hero */}
-        <section className="bg-navy text-white py-16 px-4 text-center">
-          <p className="text-gold font-bold text-sm uppercase tracking-widest mb-4">
-            منتجات السيارات للمرأة السعودية
-          </p>
-          <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-            نظّم قيادتك.
-            <br />
-            <span className="text-gold">اهدأ يومك.</span>
-          </h1>
-          <p className="text-white/70 text-lg max-w-xl mx-auto mb-8">
-            منتجات مصممة خصيصاً لتجعل قيادتك أكثر راحة وتنظيماً
-          </p>
-          <a
-            href="/shop"
-            className="inline-block bg-gold text-white font-extrabold text-lg px-8 py-4 rounded-xl hover:bg-gold-light transition-colors"
-          >
-            تسوّقي الآن
-          </a>
+        <section className="bg-navy text-white py-20 px-4 text-center relative overflow-hidden">
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold text-sm font-bold px-4 py-2 rounded-full mb-6">
+              <span>⚡</span>
+              <span>منتجات مختبرة للقيادة في السعودية</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
+              ثلاث مشاكل يومية
+              <br />
+              <span className="text-gold">حل واحد بسيط</span>
+            </h1>
+            <p className="text-white/70 text-lg mb-8">
+              منظّم المقعد، حامي الفراغ، وطقم المرايا — منظومة مختارة لتحل أكثر
+              مشاكل القيادة اليومية إزعاجاً. تركيب فوري والدفع عند الاستلام.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+              <a
+                href="/shop"
+                className="inline-block bg-gold text-white font-extrabold text-lg px-8 py-4 rounded-xl hover:bg-gold-light transition-colors"
+              >
+                اكتشف المنظومة ←
+              </a>
+              <a
+                href="/about"
+                className="inline-block border border-white/30 text-white font-bold text-lg px-8 py-4 rounded-xl hover:bg-white/10 transition-colors"
+              >
+                من نحن
+              </a>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              <span className="flex items-center gap-1 text-white/70"><span className="text-gold">✓</span> الدفع عند الاستلام</span>
+              <span className="flex items-center gap-1 text-white/70"><span className="text-gold">✓</span> توصيل سريع 2-5 أيام</span>
+              <span className="flex items-center gap-1 text-white/70"><span className="text-gold">✓</span> إرجاع مجاني 7 أيام</span>
+            </div>
+          </div>
         </section>
 
         {/* Pain strip */}
-        <section className="bg-gold/10 py-8 px-4">
-          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <section className="bg-gold/10 py-10 px-4">
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             {[
-              { icon: "🚗", text: "فوضى في المقعد؟" },
-              { icon: "😤", text: "أشياء تسقط بين المقاعد؟" },
-              { icon: "😰", text: "صعوبة في الاصطفاف؟" },
-              { icon: "✨", text: "نيدها اوتو الحل!" },
+              { icon: "🔧", title: "الفوضى في السيارة", desc: "أغراضك في كل مكان ومكان راحة ركابك يعاني؟ المنظّم يحل هذا فورياً." },
+              { icon: "🔑", title: "أغراض تختفي يومياً", desc: "مفاتيح، سماعات، عملات — كلها تختفي في فتحة المقعد كل يوم." },
+              { icon: "🚗", title: "قلق الاصطفاف", desc: "الزاوية العمياء والأماكن الضيقة — زد مجال رؤيتك واصطف بثقة." },
             ].map((item) => (
-              <div key={item.text} className="space-y-2">
-                <p className="text-3xl">{item.icon}</p>
-                <p className="font-bold text-navy text-sm">{item.text}</p>
+              <div key={item.title} className="space-y-2">
+                <p className="text-4xl">{item.icon}</p>
+                <h3 className="font-bold text-navy text-base">{item.title}</h3>
+                <p className="text-navy/60 text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -55,9 +106,11 @@ export default function HomePage() {
 
         {/* Featured products */}
         <section className="max-w-6xl mx-auto px-4 py-14">
-          <h2 className="font-extrabold text-navy text-3xl text-center mb-10">
-            منتجاتنا المميزة
-          </h2>
+          <div className="text-center mb-10">
+            <span className="text-gold text-sm font-bold uppercase tracking-widest">منتجاتنا</span>
+            <h2 className="font-extrabold text-navy text-3xl mt-2">المنظومة الكاملة</h2>
+            <p className="text-navy/60 mt-2">ثلاثة منتجات. ثلاث مشاكل محلولة. سيارة أهدأ وأنت أكثر راحة.</p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {PRODUCTS.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -65,74 +118,59 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Alternating sections */}
-        <section className="max-w-6xl mx-auto px-4 py-10 space-y-16">
-          {/* Section 1 — Image right / Text left */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <h3 className="font-extrabold text-navy text-2xl">
-                قيادة بلا فوضى
-              </h3>
-              <p className="text-navy/70 leading-relaxed">
-                منتجاتنا صُممت لتحوّل سيارتك من مساحة مشتتة إلى بيئة منظمة تعكس شخصيتك وترتيبك.
-              </p>
+        {/* Trust section */}
+        <section className="bg-navy/5 py-14 px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="text-gold text-sm font-bold uppercase tracking-widest">لماذا نيدها اوتو</span>
+              <h2 className="font-extrabold text-navy text-3xl mt-2">ثقتك تهمنا</h2>
             </div>
-            <div className="aspect-video bg-navy/10 rounded-2xl flex items-center justify-center text-6xl order-first md:order-last">
-              🚗
-            </div>
-          </div>
-
-          {/* Section 2 — Image left / Text right */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="aspect-video bg-gold/10 rounded-2xl flex items-center justify-center text-6xl">
-              ⭐
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-extrabold text-navy text-2xl">
-                ثقة أكثر من 2,400 عميلة
-              </h3>
-              <p className="text-navy/70 leading-relaxed">
-                عميلاتنا يشاركن تجاربهن الإيجابية — منتجات تستحق الثقة وتستحق القيمة.
-              </p>
-            </div>
-          </div>
-
-          {/* Section 3 — Image right / Text left */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <h3 className="font-extrabold text-navy text-2xl">
-                توصيل سريع — الدفع عند الاستلام
-              </h3>
-              <p className="text-navy/70 leading-relaxed">
-                لا حاجة لبطاقة ائتمانية. اطلبي الآن وادفعي عند وصول طلبك إليكِ.
-              </p>
-            </div>
-            <div className="aspect-video bg-navy/10 rounded-2xl flex items-center justify-center text-6xl order-first md:order-last">
-              🚚
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { icon: "💳", title: "الدفع عند الاستلام", desc: "لا بطاقة، لا دفع مسبق. ادفع بعد ما يوصل المنتج بين يديك." },
+                { icon: "📦", title: "توصيل سريع", desc: "2-5 أيام عمل لجميع مناطق المملكة العربية السعودية." },
+                { icon: "↩️", title: "إرجاع مجاني", desc: "راجع المنتج وإذا ما عجبك — إرجاع مجاني خلال 7 أيام." },
+                { icon: "🧪", title: "منتجات مختبرة", desc: "اخترنا كل منتج لحل مشكلة يومية حقيقية في بيئة القيادة السعودية." },
+              ].map((item) => (
+                <div key={item.title} className="bg-white rounded-2xl p-5 text-center shadow-sm">
+                  <div className="text-3xl mb-3">{item.icon}</div>
+                  <h4 className="font-bold text-navy mb-2">{item.title}</h4>
+                  <p className="text-navy/60 text-sm">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Reviews */}
-        <section className="bg-navy/5 py-14 px-4">
+        <section className="py-14 px-4 bg-white">
           <div className="max-w-4xl mx-auto">
-            <h2 className="font-extrabold text-navy text-3xl text-center mb-10">
-              ماذا تقول عميلاتنا؟
-            </h2>
+            <div className="text-center mb-10">
+              <span className="text-gold text-sm font-bold uppercase tracking-widest">آراء عملائنا</span>
+              <h2 className="font-extrabold text-navy text-3xl mt-2">ماذا قالوا عنّا</h2>
+              <p className="text-navy/60 mt-2">أكثر من 600 عميل راضٍ في المملكة العربية السعودية</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { name: "نورة م.", text: "المنظّم ممتاز! سيارتي أصبحت مرتبة تماماً", stars: 5 },
-                { name: "سارة ع.", text: "حامي المقعد أوقف سقوط جوالي نهائياً!", stars: 5 },
-                { name: "ريم خ.", text: "المرايا سهّلت الاصطفاف كثيراً. أنصح بها", stars: 5 },
-              ].map((r) => (
-                <div key={r.name} className="bg-white rounded-2xl p-5 shadow-sm">
-                  <div className="flex gap-0.5 mb-3">
-                    {Array(r.stars).fill(null).map((_, i) => (
-                      <span key={i} className="text-gold text-lg">★</span>
-                    ))}
+              {REVIEWS.map((r) => (
+                <div key={r.name} className="bg-navy/5 rounded-2xl p-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gold text-white font-black flex items-center justify-center text-lg">
+                        {r.initial}
+                      </div>
+                      <div>
+                        <p className="font-bold text-navy text-sm">{r.name}</p>
+                        <p className="text-navy/50 text-xs">📍 {r.city}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-0.5">
+                      {Array(r.stars).fill(null).map((_, i) => (
+                        <span key={i} className="text-gold text-sm">★</span>
+                      ))}
+                    </div>
                   </div>
                   <p className="text-navy/70 text-sm leading-relaxed mb-3">"{r.text}"</p>
-                  <p className="font-bold text-navy text-sm">{r.name}</p>
+                  <p className="text-xs text-navy/40 font-medium">✓ اشترت: {r.product}</p>
                 </div>
               ))}
             </div>
@@ -141,15 +179,12 @@ export default function HomePage() {
 
         {/* FAQ */}
         <section className="max-w-2xl mx-auto px-4 py-14">
-          <h2 className="font-extrabold text-navy text-3xl text-center mb-8">
-            الأسئلة الشائعة
-          </h2>
-          <div className="space-y-4">
-            {[
-              { q: "كيف أدفع؟", a: "الدفع عند الاستلام — لا حاجة لبطاقة ائتمانية" },
-              { q: "كم يستغرق التوصيل؟", a: "من 2 إلى 5 أيام عمل داخل المملكة" },
-              { q: "هل يمكن الإرجاع؟", a: "نعم، إرجاع مجاني خلال 14 يوماً" },
-            ].map((faq) => (
+          <div className="text-center mb-8">
+            <span className="text-gold text-sm font-bold uppercase tracking-widest">أسئلة شائعة</span>
+            <h2 className="font-extrabold text-navy text-3xl mt-2">عندك سؤال؟</h2>
+          </div>
+          <div className="space-y-3">
+            {FAQS.map((faq) => (
               <details key={faq.q} className="bg-navy/5 rounded-xl p-4 group">
                 <summary className="font-bold text-navy cursor-pointer list-none flex justify-between items-center">
                   {faq.q}
