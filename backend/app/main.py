@@ -23,10 +23,15 @@ app.add_middleware(
 async def startup() -> None:
     """Auto-run migrations on startup."""
     from app.config import settings
+    from sqlalchemy import text
     logger.info(f"Connecting to DB host: {settings.DATABASE_URL.split('@')[-1].split('/')[0]}")
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            # Add new columns safely (no-op if already exists)
+            await conn.execute(text(
+                "ALTER TABLE orders ADD COLUMN IF NOT EXISTS city VARCHAR(100)"
+            ))
         logger.info("Database tables ensured.")
     except Exception as e:
         logger.error(f"DB connection failed (will retry on first request): {e}")
