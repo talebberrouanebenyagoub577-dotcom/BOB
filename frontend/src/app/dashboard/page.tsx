@@ -12,6 +12,7 @@ interface Order {
   order_number: string;
   name: string;
   phone: string;
+  city: string;
   total: number;
   status: string;
   upsell_accepted: boolean;
@@ -105,7 +106,7 @@ export default function AdminPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  {["رقم الطلب","الاسم","الهاتف","المجموع","Upsell","التاريخ"].map(h => (
+                  {["رقم الطلب","الاسم","الهاتف","المدينة","المجموع","Upsell","التاريخ"].map(h => (
                     <th key={h} className="px-4 py-3 text-right font-bold text-gray-600">{h}</th>
                   ))}
                 </tr>
@@ -116,6 +117,7 @@ export default function AdminPage() {
                     <td className="px-4 py-3 font-mono font-bold text-gray-800">{o.order_number}</td>
                     <td className="px-4 py-3 font-medium">{o.name}</td>
                     <td className="px-4 py-3 font-mono text-gray-600" dir="ltr">{o.phone}</td>
+                    <td className="px-4 py-3 text-gray-700">{o.city || "—"}</td>
                     <td className="px-4 py-3 font-bold text-green-600">{o.total} ر.س</td>
                     <td className="px-4 py-3">
                       {o.upsell_accepted

@@ -13,12 +13,14 @@ export function CheckoutPopup() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const nameValid = name.trim().length >= 2 && !/^\d+$/.test(name.trim());
   const phoneValid = PHONE_RE.test(phone.trim());
-  const formValid = nameValid && phoneValid;
+  const cityValid = city.trim().length >= 2;
+  const formValid = nameValid && phoneValid && cityValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +33,7 @@ export function CheckoutPopup() {
     sessionStorage.setItem("pending_order", JSON.stringify({
       name: name.trim(),
       phone: phone.trim(),
+      city: city.trim(),
       items: items.map((i) => ({
         sku: i.product.sku,
         qty: i.qty,
@@ -172,6 +175,30 @@ export function CheckoutPopup() {
               {!phoneValid && phone.length > 0 && (
                 <p className="text-red-500 text-xs mt-0.5 font-medium">
                   يرجى إدخال رقم سعودي صحيح يبدأ بـ 05
+                </p>
+              )}
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block font-bold text-navy mb-1.5 text-sm">
+                المدينة
+              </label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="مثال: الرياض"
+                className={clsx(
+                  "w-full border-2 rounded-xl px-4 py-3 text-navy font-medium outline-none transition-colors",
+                  cityValid || city === ""
+                    ? "border-navy/20 focus:border-gold"
+                    : "border-red-400 focus:border-red-400"
+                )}
+              />
+              {!cityValid && city.length > 0 && (
+                <p className="text-red-500 text-xs mt-1 font-medium">
+                  يرجى إدخال اسم المدينة
                 </p>
               )}
             </div>

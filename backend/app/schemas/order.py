@@ -15,6 +15,7 @@ class OrderItemIn(BaseModel):
 class OrderIn(BaseModel):
     name: str
     phone: str
+    city: Optional[str] = None
     items: list[OrderItemIn]
     total: float
     upsell_accepted: bool = False
