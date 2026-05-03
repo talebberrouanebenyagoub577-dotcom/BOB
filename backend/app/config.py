@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     GOOGLE_SHEET_WEBHOOK: str = ""
     SECRET_KEY: str = "change-me"
+    WHITELISTED_PHONES: str = "0779185640,+966550603022"
 
 
 settings = Settings()

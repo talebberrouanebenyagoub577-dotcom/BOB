@@ -2,7 +2,7 @@ import random
 import string
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -13,8 +13,30 @@ from app.models.order import Order, OrderItem
 from app.schemas.order import OrderIn, OrderOut
 from app.services.tracking import fire_all_capi
 from app.services.webhook import send_to_sheets
+from app.services.geo import is_saudi_ip
 
 router = APIRouter()
+
+
+def _get_client_ip(request: Request) -> str:
+    """Get real client IP — handles Cloudflare CF-Connecting-IP and X-Forwarded-For."""
+    cf_ip = request.headers.get("CF-Connecting-IP")
+    if cf_ip:
+        return cf_ip.strip()
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else ""
+
+
+def _is_whitelisted(phone: str) -> bool:
+    allowed = [p.strip() for p in settings.WHITELISTED_PHONES.split(",") if p.strip()]
+    normalized = phone.strip().replace("+966", "0").replace("966", "0", 1)
+    for p in allowed:
+        p_norm = p.replace("+966", "0").replace("966", "0", 1)
+        if normalized == p_norm or phone == p:
+            return True
+    return False
 
 
 def _generate_order_number() -> str:
@@ -24,10 +46,17 @@ def _generate_order_number() -> str:
 
 @router.post("/order", response_model=OrderOut)
 async def create_order(
+    request: Request,
     body: OrderIn,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
 ) -> OrderOut:
+    # Block non-KSA orders unless phone is whitelisted
+    if not _is_whitelisted(body.phone):
+        client_ip = _get_client_ip(request)
+        if not await is_saudi_ip(client_ip):
+            raise HTTPException(status_code=403, detail="الخدمة متاحة داخل المملكة العربية السعودية فقط")
+
     order_number = _generate_order_number()
 
     order = Order(
