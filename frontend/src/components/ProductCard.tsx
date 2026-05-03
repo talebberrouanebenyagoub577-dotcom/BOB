@@ -33,10 +33,14 @@ export function ProductCard({ product }: Props) {
     <article className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
       {/* Image */}
       <div className="relative">
-        <Link href={`/products/${product.id}`} className="block aspect-square bg-gray-100 relative overflow-hidden">
-          <div className="w-full h-full flex items-center justify-center text-gray-300 text-6xl select-none">
-            🛍️
-          </div>
+        <Link href={`/products/${product.id}`} className="block aspect-square bg-navy/10 relative overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image}
+            alt={product.nameAr}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
         </Link>
         {product.badge && (
           <span className="absolute top-3 right-3 bg-gold text-white text-xs font-bold px-2 py-1 rounded-lg">

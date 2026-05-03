@@ -10,7 +10,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "منظّم ذكي يحوّل مقعد سيارتك إلى مساحة منظمة بالكامل. جيوب متعددة، تصميم مرن، تركيب في دقيقتين.",
     price: 199,
-    image: "/images/seat-organizer.jpg",
+    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Smart+Seat+Organizer",
     badge: "الأكثر مبيعاً",
     reviewCount: 284,
     rating: 5,
@@ -30,7 +30,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "يسد الفجوة بين المقعد والكونسول نهائياً. لا مزيد من فقدان المفاتيح أو الجوال أو العملات.",
     price: 199,
-    image: "/images/seatgap-protector.jpg",
+    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Seat+Gap+Protector",
     badge: "مشكلة يومية",
     reviewCount: 197,
     rating: 5,
@@ -50,7 +50,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "عدسة واسعة الزاوية تُريك الزوايا العمياء بوضوح تام. ثبّتها على مرآتك الخارجية وتخلص من قلق الاصطفاف.",
     price: 199,
-    image: "/images/parking-mirror.jpg",
+    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Parking+Mirror+Kit",
     badge: "ثقة بالقيادة",
     reviewCount: 156,
     rating: 5,
