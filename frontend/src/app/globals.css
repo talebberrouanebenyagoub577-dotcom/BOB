@@ -1,12 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: "Cairo", sans-serif;
+    font-family: var(--font-cairo), "Cairo", sans-serif;
     direction: rtl;
     scroll-behavior: smooth;
   }
