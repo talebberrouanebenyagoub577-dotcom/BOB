@@ -25,11 +25,29 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "DATABASE_URL=postgresql+asyncpg://nidhamauto:$(DB_PASSWORD)@organisat_databes:5432/nidhamauto\nSECRET_KEY=$(SECRET_KEY)\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nMETA_TEST_EVENT_CODE=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=\nGOOGLE_SHEET_WEBHOOK=",
+        "env": "DATABASE_URL=postgresql+asyncpg://nidhamauto:$(DB_PASSWORD)@db:5432/nidhamauto\nSECRET_KEY=$(SECRET_KEY)\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nMETA_TEST_EVENT_CODE=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=\nGOOGLE_SHEET_WEBHOOK=",
         "domains": [
           {
             "host": "api.$(EASYPANEL_DOMAIN)",
             "port": 8000
+          }
+        ]
+      }
+    },
+    {
+      "type": "app",
+      "data": {
+        "projectName": "$(PROJECT_NAME)",
+        "serviceName": "pgweb",
+        "source": {
+          "type": "image",
+          "image": "sosedoff/pgweb"
+        },
+        "env": "DATABASE_URL=postgres://nidhamauto:$(DB_PASSWORD)@db:5432/nidhamauto?sslmode=disable",
+        "domains": [
+          {
+            "host": "pgweb.$(EASYPANEL_DOMAIN)",
+            "port": 8081
           }
         ]
       }

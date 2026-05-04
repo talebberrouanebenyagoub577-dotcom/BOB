@@ -44,5 +44,17 @@ services:
     depends_on:
       - backend
 
+  pgweb:
+    image: sosedoff/pgweb
+    container_name: nidhamauto_pgweb
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_URL: postgres://nidhamauto:nidhamauto@db:5432/nidhamauto?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pg_data:
