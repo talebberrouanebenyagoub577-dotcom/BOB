@@ -1,6 +1,7 @@
 import random
 import string
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from sqlalchemy import select, desc, text
@@ -40,8 +41,24 @@ def _is_whitelisted(phone: str) -> bool:
 
 
 def _generate_order_number() -> str:
-    suffix = "".join(random.choices(string.digits, k=6))
-    return f"nama{suffix}"
+    suffix = "".join(random.choices(string.digits, k=8))
+    return f"nidha{suffix}"
+
+
+# Stable catalog SKUs (also accept legacy NM-* from old sessions)
+PRODUCT_NAMES_BY_SKU = {
+    "nidha-K7XQ92": "المنظّم الذكي للمقعد",
+    "nidha-M4PW81": "حامي فراغ المقعد",
+    "nidha-R9TZ73": "طقم مرايا الاصطفاف الدقيق",
+    "NM-SO-001": "المنظّم الذكي للمقعد",
+    "NM-SG-001": "حامي فراغ المقعد",
+    "NM-PM-001": "طقم مرايا الاصطفاف الدقيق",
+}
+
+
+def _phone_sheet_format(phone_05: str) -> str:
+    """05XXXXXXXX -> 9665XXXXXXXX (no + prefix)."""
+    return "966" + phone_05.lstrip("0")
 
 
 @router.post("/order", response_model=OrderOut)
@@ -79,20 +96,22 @@ async def create_order(
     await db.refresh(order)
 
     # Build per-item lists (include upsell if accepted)
-    products_ar = [i.name_ar for i in body.items]
+    products_ar = [i.name_ar or PRODUCT_NAMES_BY_SKU.get(i.sku, i.sku) for i in body.items]
     skus = [i.sku for i in body.items]
     quantities = [str(i.qty) for i in body.items]
     if body.upsell_accepted and body.upsell_sku:
-        products_ar.append(body.upsell_name_ar or "")
+        products_ar.append(
+            body.upsell_name_ar
+            or PRODUCT_NAMES_BY_SKU.get(body.upsell_sku, body.upsell_sku)
+        )
         skus.append(body.upsell_sku)
         quantities.append("1")
 
-    # Format phone: 05XXXXXXXX → 9665XXXXXXXX
-    phone_intl = "966" + body.phone.lstrip("0")
+    phone_intl = _phone_sheet_format(body.phone)
 
-    # Sheets webhook payload — columns match the Nama Store sheet exactly
+    # Google Sheet row — match header: date,orderid,country,name,phone,product,sku,quantity,totalprix,currency,status
     sheet_payload = {
-        "date": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
+        "date": datetime.now(ZoneInfo("Asia/Riyadh")).strftime("%d/%m/%Y"),
         "orderid": order_number,
         "country": "KSA",
         "name": body.name,
@@ -102,7 +121,7 @@ async def create_order(
         "quantity": "/".join(quantities),
         "totalprix": body.total,
         "currency": "SAR",
-        "statue": "",
+        "status": "",
     }
 
     # Fire background tasks — never block response

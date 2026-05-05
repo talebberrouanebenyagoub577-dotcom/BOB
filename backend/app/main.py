@@ -45,10 +45,7 @@ async def health() -> dict:
 @app.get("/admin/diagnose")
 async def diagnose() -> dict:
     import socket
-    hosts = [
-        "databes", "organisat_databes", "organisat-databes",
-        "nidhamauto_database", "host.docker.internal", "172.17.0.1",
-    ]
+    hosts = ["db", "nidhamauto_database", "host.docker.internal", "172.17.0.1"]
     results = {}
     for host in hosts:
         try:
