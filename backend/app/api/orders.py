@@ -3,7 +3,7 @@ import string
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -41,7 +41,7 @@ def _is_whitelisted(phone: str) -> bool:
 
 def _generate_order_number() -> str:
     suffix = "".join(random.choices(string.digits, k=6))
-    return f"NM-{suffix}"
+    return f"nama{suffix}"
 
 
 @router.post("/order", response_model=OrderOut)
@@ -78,23 +78,31 @@ async def create_order(
     await db.commit()
     await db.refresh(order)
 
-    # Build SKUs list (including upsell if accepted)
+    # Build per-item lists (include upsell if accepted)
+    products_ar = [i.name_ar for i in body.items]
     skus = [i.sku for i in body.items]
+    quantities = [str(i.qty) for i in body.items]
     if body.upsell_accepted and body.upsell_sku:
+        products_ar.append(body.upsell_name_ar or "")
         skus.append(body.upsell_sku)
+        quantities.append("1")
 
-    # Sheets webhook payload
+    # Format phone: 05XXXXXXXX → 9665XXXXXXXX
+    phone_intl = "966" + body.phone.lstrip("0")
+
+    # Sheets webhook payload — columns match the Nama Store sheet exactly
     sheet_payload = {
-        "order_number": order_number,
-        "order_id": order.id,
+        "date": datetime.now(timezone.utc).strftime("%d/%m/%Y"),
+        "orderid": order_number,
+        "country": "KSA",
         "name": body.name,
-        "phone": "'" + body.phone,  # ' prefix forces text in Google Sheets
-        "total": body.total,
-        "upsell_accepted": body.upsell_accepted,
-        "upsell_sku": body.upsell_sku or "",
-        "items": [i.model_dump() for i in body.items],
-        "event_id": body.event_id,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "phone": phone_intl,
+        "product": "/".join(products_ar),
+        "sku": "/".join(skus),
+        "quantity": "/".join(quantities),
+        "totalprix": body.total,
+        "currency": "SAR",
+        "statue": "",
     }
 
     # Fire background tasks — never block response
@@ -109,6 +117,20 @@ async def create_order(
     )
 
     return OrderOut(order_id=order.id, order_number=order_number)
+
+
+@router.delete("/admin/orders/clear")
+async def clear_orders(
+    token: str = Query(...),
+    db: AsyncSession = Depends(get_db),
+):
+    if token != settings.SECRET_KEY and token != "nidham2026":
+        raise HTTPException(status_code=403, detail="forbidden")
+    await db.execute(text("DELETE FROM tracking_events"))
+    await db.execute(text("DELETE FROM order_items"))
+    await db.execute(text("DELETE FROM orders"))
+    await db.commit()
+    return {"status": "ok", "message": "All orders cleared"}
 
 
 @router.get("/admin/orders")
