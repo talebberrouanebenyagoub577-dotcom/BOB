@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 async def send_to_sheets(payload: dict) -> None:
-    if not settings.GOOGLE_SHEET_WEBHOOK:
+    if not settings.GOOGLE_SHEETS_WEBHOOK_URL:
         return
 
     for attempt in range(3):
         try:
             async with httpx.AsyncClient() as client:
-                r = await client.post(settings.GOOGLE_SHEET_WEBHOOK, json=payload, timeout=10.0)
+                r = await client.post(settings.GOOGLE_SHEETS_WEBHOOK_URL, json=payload, timeout=10.0, follow_redirects=True)
                 r.raise_for_status()
                 return
         except Exception as exc:
