@@ -3,14 +3,14 @@ import type { Product, PriceTier } from "@/types";
 export const PRODUCTS: Product[] = [
   {
     id: "seat-organizer",
-    sku: "NM-SO-001",
+    sku: "nidha-K7XQ92",
     nameAr: "المنظّم الذكي للمقعد",
     shortAr: "منظّم ذكي",
     shortBenefit: "خلّي سيارتك مرتبة ومريحة دائماً",
     descriptionAr:
       "منظّم ذكي يحوّل مقعد سيارتك إلى مساحة منظمة بالكامل. جيوب متعددة، تصميم مرن، تركيب في دقيقتين.",
     price: 199,
-    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Smart+Seat+Organizer",
+    image: "/product-detail/seat-organizer.png",
     badge: "الأكثر مبيعاً",
     reviewCount: 284,
     rating: 5,
@@ -23,14 +23,14 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: "seatgap-protector",
-    sku: "NM-SG-001",
+    sku: "nidha-M4PW81",
     nameAr: "حامي فراغ المقعد",
     shortAr: "حامي المقعد",
     shortBenefit: "أوقف ضياع أغراضك في فتحة المقعد",
     descriptionAr:
       "يسد الفجوة بين المقعد والكونسول نهائياً. لا مزيد من فقدان المفاتيح أو الجوال أو العملات.",
     price: 199,
-    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Seat+Gap+Protector",
+    image: "/product-detail/seatgap-protector.png",
     badge: "مشكلة يومية",
     reviewCount: 197,
     rating: 5,
@@ -43,14 +43,14 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: "parking-mirror",
-    sku: "NM-PM-001",
+    sku: "nidha-R9TZ73",
     nameAr: "طقم مرايا الاصطفاف الدقيق",
     shortAr: "طقم المرايا",
     shortBenefit: "اصطفّ بثقة في أضيق الأماكن",
     descriptionAr:
       "عدسة واسعة الزاوية تُريك الزوايا العمياء بوضوح تام. ثبّتها على مرآتك الخارجية وتخلص من قلق الاصطفاف.",
     price: 199,
-    image: "https://placehold.co/480x360/0F1B2D/C9962A?text=Parking+Mirror+Kit",
+    image: "/product-detail/parking-mirror.png",
     badge: "ثقة بالقيادة",
     reviewCount: 156,
     rating: 5,
