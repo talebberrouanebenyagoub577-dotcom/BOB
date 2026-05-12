@@ -4,7 +4,9 @@ import { ProductCard } from "@/components/ProductCard";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
+import { HeroTrackLinks } from "@/components/HeroTrackLinks";
 import { PRODUCTS } from "@/data/products";
+import { BRAND } from "@/lib/brand";
 
 const REVIEWS = [
   {
@@ -53,32 +55,19 @@ export default function HomePage() {
         <section className="bg-navy text-white py-20 px-4 text-center relative overflow-hidden">
           <div className="relative z-10 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold text-sm font-bold px-4 py-2 rounded-full mb-6">
-              <span>⚡</span>
-              <span>منتجات مختبرة للقيادة في السعودية</span>
+              <span>✓</span>
+              <span>إكسسوارات مقصورة مختارة — ثقة ووضوح</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
-              ثلاث مشاكل يومية
+              مقصورة أنظف…
               <br />
-              <span className="text-gold">حل واحد بسيط</span>
+              <span className="text-gold">قيادة أوثق</span>
             </h1>
-            <p className="text-white/70 text-lg mb-8">
-              منظّم المقعد، حامي الفراغ، وطقم المرايا — منظومة مختارة لتحل أكثر
-              مشاكل القيادة اليومية إزعاجاً. تركيب فوري والدفع عند الاستلام.
+            <p className="text-white/75 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+              {BRAND.nameAr} تجمع لك منظّم المقعد، حامي فراغ المقعد، وطقم مرايا الركن — منتجات نستخدمها
+              لحلّ فوضى داخل السيارة وقلق المواقف الضيقة، مع الدفع عند الاستلام والتوصيل داخل المملكة.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-              <a
-                href="/shop"
-                className="inline-block bg-gold text-white font-extrabold text-lg px-8 py-4 rounded-xl hover:bg-gold-light transition-colors"
-              >
-                اكتشف المنظومة ←
-              </a>
-              <a
-                href="/about"
-                className="inline-block border border-white/30 text-white font-bold text-lg px-8 py-4 rounded-xl hover:bg-white/10 transition-colors"
-              >
-                من نحن
-              </a>
-            </div>
+            <HeroTrackLinks />
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <span className="flex items-center gap-1 text-white/70"><span className="text-gold">✓</span> الدفع عند الاستلام</span>
               <span className="flex items-center gap-1 text-white/70"><span className="text-gold">✓</span> توصيل سريع 2-5 أيام</span>
@@ -122,7 +111,7 @@ export default function HomePage() {
         <section className="bg-navy/5 py-14 px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <span className="text-gold text-sm font-bold uppercase tracking-widest">لماذا نيدها اوتو</span>
+            <span className="text-gold text-sm font-bold uppercase tracking-widest">لماذا {BRAND.nameAr}</span>
               <h2 className="font-extrabold text-navy text-3xl mt-2">ثقتك تهمنا</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -148,7 +137,7 @@ export default function HomePage() {
             <div className="text-center mb-10">
               <span className="text-gold text-sm font-bold uppercase tracking-widest">آراء عملائنا</span>
               <h2 className="font-extrabold text-navy text-3xl mt-2">ماذا قالوا عنّا</h2>
-              <p className="text-navy/60 mt-2">أكثر من 600 عميل راضٍ في المملكة العربية السعودية</p>
+              <p className="text-navy/60 mt-2">تجارب عملاء يشاركونا انطباعهم بعد استخدام الإكسسوارات في يومهم.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {REVIEWS.map((r) => (

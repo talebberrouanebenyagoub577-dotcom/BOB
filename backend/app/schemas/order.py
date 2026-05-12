@@ -33,6 +33,7 @@ class OrderIn(BaseModel):
     upsell_sku: Optional[str] = None
     upsell_name_ar: Optional[str] = None
     event_id: str
+    session_id: Optional[str] = None
 
     @field_validator("name")
     @classmethod

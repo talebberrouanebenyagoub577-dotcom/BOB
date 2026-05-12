@@ -5,8 +5,9 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { PRODUCTS, PRICE_TIERS } from "@/data/products";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "المنتجات | نيدها اوتو" };
+export const metadata = { title: "المنتجات" };
 
 export default function CollectionPage() {
   return (
@@ -18,8 +19,12 @@ export default function CollectionPage() {
 
       <main className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
+          <p className="text-gold text-sm font-bold mb-2">{BRAND.taglineAr}</p>
           <h1 className="font-extrabold text-navy text-4xl mb-3">جميع المنتجات</h1>
-          <p className="text-navy/60 text-lg">اختاري المنتج المناسب لاحتياجاتك</p>
+          <p className="text-navy/60 text-lg max-w-2xl mx-auto">
+            مجموعتنا الحالية تركّز على ثلاثة محاور: التنظيم، حماية الأغراض، ورؤية أوضح عند الركن — بجودة
+            نوضحها وبتجربة طلب بسيطة مع {BRAND.nameAr}.
+          </p>
         </div>
 
         {/* Pricing tiers banner */}

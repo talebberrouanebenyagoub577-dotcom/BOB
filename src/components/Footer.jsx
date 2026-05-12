@@ -1,4 +1,9 @@
 import { Link } from "react-router-dom";
+import { BRAND } from "../brand.js";
+
+const showAdminNavLink =
+  import.meta.env.DEV === true ||
+  String(import.meta.env.VITE_SHOW_ADMIN_LINK || "").trim() === "true";
 
 export default function Footer() {
   return (
@@ -11,11 +16,10 @@ export default function Footer() {
               <div className="footer-logo-circle">
                 <span className="footer-logo-letter">N</span>
               </div>
-              <span className="footer-brand-name">نيدها اوتو</span>
+              <span className="footer-brand-name">{BRAND.nameAr}</span>
             </div>
             <p className="footer-desc">
-              منظومة قيادة يومية للسوق السعودي. منتجات مختبرة تحل مشاكل
-              القيادة الحقيقية. الدفع عند الاستلام لجميع مناطق المملكة.
+              {BRAND.footerBlurbAr}
             </p>
           </div>
 
@@ -27,6 +31,11 @@ export default function Footer() {
               <Link to="/collection">المتجر</Link>
               <Link to="/about">من نحن</Link>
               <Link to="/contact">تواصل معنا</Link>
+              {showAdminNavLink && (
+                <Link to="/admin" className="text-slate-500">
+                  لوحة التحكم
+                </Link>
+              )}
             </div>
           </div>
 
@@ -44,7 +53,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p>© 2026 نيدها اوتو — جميع الحقوق محفوظة</p>
+          <p>© {new Date().getFullYear()} {BRAND.nameAr} — جميع الحقوق محفوظة</p>
           <div className="footer-cod-badge">
             <span>✓</span>
             <span>الدفع عند الاستلام فقط</span>

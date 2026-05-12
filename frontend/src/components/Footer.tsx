@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BRAND } from "@/lib/brand";
 
 export function Footer() {
   return (
@@ -6,9 +7,9 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Brand */}
         <div>
-          <p className="font-extrabold text-white text-base mb-2">نيدها اوتو</p>
+          <p className="font-extrabold text-white text-base mb-2">{BRAND.nameAr}</p>
           <p className="leading-relaxed">
-            منتجات السيارات للمرأة السعودية. الدفع عند الاستلام. توصيل سريع.
+            {BRAND.footerBlurbAr}
           </p>
         </div>
 
@@ -18,7 +19,7 @@ export function Footer() {
           <ul className="space-y-2">
             <li><Link href="/shop" className="hover:text-gold transition-colors">المنتجات</Link></li>
             <li><Link href="/about" className="hover:text-gold transition-colors">من نحن</Link></li>
-            <li><Link href="/contact" className="hover:text-gold transition-colors">تواصلي معنا</Link></li>
+            <li><Link href="/contact" className="hover:text-gold transition-colors">تواصل معنا</Link></li>
           </ul>
         </div>
 
@@ -36,7 +37,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10 text-center py-4 text-xs">
-        © {new Date().getFullYear()} نيدها اوتو — جميع الحقوق محفوظة
+        © {new Date().getFullYear()} {BRAND.nameAr} — جميع الحقوق محفوظة
       </div>
     </footer>
   );

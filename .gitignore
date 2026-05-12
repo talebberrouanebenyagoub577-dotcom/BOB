@@ -1,3 +1,26 @@
 node_modules
 dist
 .env
+**/.env
+!.env.example
+!**/.env.example
+
+# backend venv created by scripts/start-backend.mjs
+backend/.venv
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/tsconfig.tsbuildinfo
+
+# Local deploy helpers (may contain credentials)
+ssh_run.cjs
+ssh_script.cjs
+
+# Accidental data exports
+ordder nidhamoto - Sheet1.csv

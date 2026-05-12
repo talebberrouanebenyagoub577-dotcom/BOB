@@ -1,5 +1,5 @@
 /* ===========================
-   NIDHA MAUTO — PREMIUM STORE
+   NIDHA AUTO — علامة إكسسوارات مقصورة
    RTL / Arabic / KSA
    =========================== */
 
@@ -7,13 +7,13 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --navy:       #0F1B2D;
-  --navy-light: #1A2F4A;
-  --gold:       #C9962A;
-  --gold-light: #F5D580;
-  --gold-pale:  #FDF8EC;
+  --navy:       #0B1628;
+  --navy-light: #152A45;
+  --gold:       #C9A24D;
+  --gold-light: #D4B465;
+  --gold-pale:  #F5ECD8;
   --white:      #FFFFFF;
-  --gray-50:    #F9FAFB;
+  --gray-50:    #F6F4EF;
   --gray-100:   #F3F4F6;
   --gray-200:   #E5E7EB;
   --gray-400:   #9CA3AF;
@@ -191,11 +191,17 @@ img { display: block; max-width: 100%; }
 .section-header--center .section-sub { margin: 0 auto; }
 
 /* ---------- PRODUCT CARDS ---------- */
-.products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.products-grid {
+  display: grid;
+  /* min(100%,…) يمنع تجاوز عرض الشاشة على الموبايل وقص النصوص على الجانب */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 24px;
+}
 .product-card {
   background: var(--white); border-radius: var(--radius-xl);
   border: 1px solid var(--gray-200); overflow: hidden;
   display: flex; flex-direction: column;
+  min-width: 0;
   transition: transform .2s, box-shadow .2s;
   box-shadow: var(--shadow-sm);
 }
@@ -215,12 +221,38 @@ img { display: block; max-width: 100%; }
   display: flex; align-items: center; gap: 4px;
 }
 
-.product-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.product-body {
+  padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px;
+  min-width: 0;
+}
 .stars { display: flex; flex-direction: row-reverse; gap: 2px; }
 .star { color: var(--gold); font-size: 16px; }
 .review-count { font-size: 12px; color: var(--gray-600); font-weight: 600; }
-.product-card h3 { font-size: 20px; font-weight: 800; color: var(--navy); line-height: 1.3; }
-.product-benefit { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+.product-card h3 {
+  font-size: 20px; font-weight: 800; color: var(--navy); line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.product-benefit {
+  font-size: 14px; color: var(--gray-600); line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.product-benefit-toggle {
+  margin-top: 6px;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.product-benefit-toggle:hover { color: var(--navy); }
 
 .price-tiers { display: flex; flex-direction: column; gap: 6px; }
 .price-tier-row {
@@ -347,6 +379,7 @@ img { display: block; max-width: 100%; }
 /* ---------- PRODUCT PAGE ---------- */
 .product-page { padding: 48px 0 80px; }
 .product-page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.product-page-grid > * { min-width: 0; }
 
 .product-gallery { display: flex; flex-direction: column; gap: 12px; }
 .main-img {
@@ -354,6 +387,46 @@ img { display: block; max-width: 100%; }
   aspect-ratio: 4/3; background: var(--gray-100); position: relative;
 }
 .main-img img { width: 100%; height: 100%; object-fit: cover; }
+/** صور التفصيل الحقيقية (كولاج أو لقطة مقرّبة) — إظهار كامل الإطار */
+.main-img--detail-hero { aspect-ratio: 4/3; }
+.main-img--detail-hero img { object-fit: contain; }
+
+.product-pdp-shared-visual {
+  margin-top: 40px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--gray-100);
+}
+.product-pdp-shared-visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+.product-pdp-highlight-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .product-pdp-highlight-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.product-pdp-highlight-cell {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--gray-100);
+}
+.product-pdp-highlight-cell img {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
 .product-badge-lg {
   position: absolute; top: 16px; right: 16px;
   background: var(--gold); color: var(--white);
@@ -363,6 +436,65 @@ img { display: block; max-width: 100%; }
 .product-info { display: flex; flex-direction: column; gap: 20px; }
 .product-title { font-size: clamp(24px,3vw,34px); font-weight: 900; color: var(--navy); line-height: 1.2; }
 .product-sub { font-size: 16px; color: var(--gray-600); line-height: 1.7; }
+
+.product-story {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  border: 1px solid var(--gray-200);
+}
+.product-story-p {
+  font-size: 15px;
+  color: var(--gray-700);
+  line-height: 1.85;
+  margin-bottom: 14px;
+}
+.product-story-p:last-child { margin-bottom: 0; }
+
+.product-inbox-section {
+  background: var(--gold-pale);
+  border: 1px solid rgba(201,150,42,.35);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+}
+.product-inbox-section h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.product-inbox-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product-inbox-list li {
+  font-size: 14px;
+  color: var(--gray-800);
+  line-height: 1.55;
+  padding-right: 22px;
+  position: relative;
+}
+.product-inbox-list li::before {
+  content: "✓";
+  position: absolute;
+  right: 0;
+  color: var(--green);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.product-ideal {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.75;
+  padding: 16px 18px;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  border-right: 4px solid var(--gold);
+}
+.product-ideal strong { color: var(--navy); }
 
 .ratings-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .ratings-count { font-size: 14px; color: var(--gray-600); font-weight: 600; }
@@ -472,7 +604,7 @@ img { display: block; max-width: 100%; }
   align-items: flex-start;
 }
 .cart-item-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--gray-100); }
-.cart-item-info { flex: 1; }
+.cart-item-info { flex: 1; min-width: 0; }
 .cart-item-name { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.3; }
 .cart-item-price { font-size: 13px; color: var(--gray-600); }
 .cart-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
@@ -555,7 +687,8 @@ img { display: block; max-width: 100%; }
 .popup-summary h3 { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 16px; }
 .popup-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 .popup-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.popup-item-name { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+.popup-item > div:first-child { min-width: 0; }
+.popup-item-name { font-size: 14px; font-weight: 600; color: var(--gray-900); overflow-wrap: anywhere; }
 .popup-item-qty { font-size: 12px; color: var(--gray-400); }
 .popup-item-price { font-size: 15px; font-weight: 800; color: var(--navy); white-space: nowrap; }
 .popup-total { display: flex; justify-content: space-between; padding-top: 12px; border-top: 2px solid var(--gray-200); }
@@ -589,6 +722,14 @@ img { display: block; max-width: 100%; }
 .checkout-trust { display: flex; flex-direction: column; gap: 6px; padding: 12px; background: var(--green-light); border-radius: var(--radius); }
 .checkout-trust-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #166534; }
 
+/* طبقة Upsell فوق نافذة الدفع بالكامل */
+.upsell-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.65);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s; z-index: 315;
+}
+.upsell-overlay.visible { opacity: 1; pointer-events: all; }
+
 /* ---------- UPSELL MODAL ---------- */
 .upsell-modal {
   position: fixed; inset: 50% auto auto 50%;
@@ -598,7 +739,7 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 20px 60px rgba(0,0,0,.25);
   opacity: 0; pointer-events: none;
   transition: opacity .2s, transform .2s;
-  z-index: 320;
+  z-index: 325;
 }
 .upsell-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BRAND } from "@/lib/brand";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
@@ -16,15 +17,19 @@ export default function ContactPage() {
     <>
       <Header />
       <main className="max-w-xl mx-auto px-4 py-14">
-        <h1 className="font-extrabold text-navy text-4xl text-center mb-8">
-          تواصلي معنا
+        <h1 className="font-extrabold text-navy text-4xl text-center mb-4">
+          تواصل معنا
         </h1>
+        <p className="text-center text-navy/60 text-sm max-w-md mx-auto mb-8 leading-relaxed">
+          فريق {BRAND.nameAr} يقرأ رسائلك باهتمام. اذكر رقم الطلب إن كان استفسارك يتعلق بشحنة أو
+          منتج.
+        </p>
 
         {sent ? (
           <div className="text-center space-y-4 py-12">
             <p className="text-5xl">✅</p>
             <p className="font-bold text-navy text-xl">تم إرسال رسالتك!</p>
-            <p className="text-navy/60">سنرد عليكِ في أقرب وقت ممكن.</p>
+            <p className="text-navy/60">سنرد عليك في أقرب وقت ممكن.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">

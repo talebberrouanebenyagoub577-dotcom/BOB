@@ -3,9 +3,19 @@
 import { useState } from "react";
 import { useCartStore } from "@/lib/store";
 import { generateEventId } from "@/lib/eventId";
+import { getTrackingSessionId } from "@/lib/serverTrack";
 import clsx from "clsx";
 
-const PHONE_RE = /^05\d{8}$/;
+function normalizeSaudiPhone(value: string): string {
+  const digits = value.trim().replace(/[^\d+]/g, "");
+  if (/^\+9665\d{8}$/.test(digits)) return `0${digits.slice(4)}`;
+  if (/^9665\d{8}$/.test(digits)) return `0${digits.slice(3)}`;
+  return digits;
+}
+
+function isValidSaudiPhone(value: string): boolean {
+  return /^05\d{8}$/.test(normalizeSaudiPhone(value));
+}
 
 export function CheckoutPopup() {
   const { items, isCheckoutOpen, closeCheckout, openUpsell, upsellShownThisSession, total, clearCart } =
@@ -13,14 +23,12 @@ export function CheckoutPopup() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const nameValid = name.trim().length >= 2 && !/^\d+$/.test(name.trim());
-  const phoneValid = PHONE_RE.test(phone.trim());
-  const cityValid = city.trim().length >= 2;
-  const formValid = nameValid && phoneValid && cityValid;
+  const phoneValid = isValidSaudiPhone(phone);
+  const formValid = nameValid && phoneValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,15 +40,16 @@ export function CheckoutPopup() {
     // Store event_id for post-upsell order submission
     sessionStorage.setItem("pending_order", JSON.stringify({
       name: name.trim(),
-      phone: phone.trim(),
-      city: city.trim(),
+      phone: normalizeSaudiPhone(phone),
       items: items.map((i) => ({
         sku: i.product.sku,
         qty: i.qty,
         unit_price: Math.round(i.price / i.qty),
+        name_ar: i.product.nameAr,
       })),
       total: total(),
       event_id: eventId,
+      session_id: getTrackingSessionId(),
     }));
 
     closeCheckout();
@@ -58,14 +67,11 @@ export function CheckoutPopup() {
     if (!raw) return;
     const payload = { ...JSON.parse(raw), upsell_accepted: upsellAccepted };
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/order`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       if (!res.ok) throw new Error("order failed");
       const data = await res.json();
       sessionStorage.setItem("last_order", JSON.stringify({ ...payload, ...data }));
@@ -162,8 +168,8 @@ export function CheckoutPopup() {
                 dir="ltr"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="05XXXXXXXX"
-                maxLength={10}
+                placeholder="05XXXXXXXX أو +9665XXXXXXXX"
+                maxLength={13}
                 className={clsx(
                   "w-full border-2 rounded-xl px-4 py-3 font-mono tracking-wider text-navy outline-none transition-colors",
                   phoneValid || phone === ""
@@ -171,34 +177,10 @@ export function CheckoutPopup() {
                     : "border-red-400 focus:border-red-400"
                 )}
               />
-              <p className="text-navy/40 text-xs mt-1">مثال: 0512345678</p>
+              <p className="text-navy/40 text-xs mt-1">مثال: 0512345678 أو +966512345678</p>
               {!phoneValid && phone.length > 0 && (
                 <p className="text-red-500 text-xs mt-0.5 font-medium">
-                  يرجى إدخال رقم سعودي صحيح يبدأ بـ 05
-                </p>
-              )}
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block font-bold text-navy mb-1.5 text-sm">
-                المدينة
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="مثال: الرياض"
-                className={clsx(
-                  "w-full border-2 rounded-xl px-4 py-3 text-navy font-medium outline-none transition-colors",
-                  cityValid || city === ""
-                    ? "border-navy/20 focus:border-gold"
-                    : "border-red-400 focus:border-red-400"
-                )}
-              />
-              {!cityValid && city.length > 0 && (
-                <p className="text-red-500 text-xs mt-1 font-medium">
-                  يرجى إدخال اسم المدينة
+                  يرجى إدخال رقم سعودي صحيح مثل 05XXXXXXXX أو +9665XXXXXXXX
                 </p>
               )}
             </div>

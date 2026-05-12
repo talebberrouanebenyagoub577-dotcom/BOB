@@ -8,7 +8,7 @@ const STEPS = [
   "الدفع نقداً للمندوب عند الاستلام",
 ];
 
-export default function ThankYouPage({ order }) {
+export default function ThankYouPage({ order, onContinueShopping }) {
   if (!order) return null;
 
   const maskedPhone =
@@ -104,7 +104,16 @@ export default function ThankYouPage({ order }) {
             </strong>
           </p>
 
-          <Link to="/collection" className="btn btn-navy btn-full" style={{ textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "var(--gray-600)", textAlign: "center", marginTop: 16 }}>
+            تم إفراغ سلة التسوق بعد تأكيد الطلب — يمكنك متابعة التسوق في أي وقت.
+          </p>
+
+          <Link
+            to="/collection"
+            className="btn btn-navy btn-full"
+            style={{ textAlign: "center" }}
+            onClick={() => onContinueShopping?.()}
+          >
             تصفّح المزيد من المنتجات
           </Link>
         </div>

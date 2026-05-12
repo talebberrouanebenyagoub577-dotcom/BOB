@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { PRODUCTS } from "../data/products";
 import { useCart } from "../store/cartStore";
+import { BRAND } from "../brand.js";
 
 function StarRow({ count = 5 }) {
   return (
@@ -14,13 +16,18 @@ function StarRow({ count = 5 }) {
 
 export default function CollectionPage() {
   const { addToCart } = useCart();
+  const [descExpanded, setDescExpanded] = useState(() => ({}));
+
+  const toggleDesc = (id) => {
+    setDescExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   return (
     <>
       <section className="collection-header">
         <div className="container">
           <h1>المتجر</h1>
-          <p>منتجات مختارة لحل مشاكل القيادة اليومية في السعودية</p>
+          <p>{BRAND.taglineAr} — مجموعة حالية تركّز على التنظيم، حماية الأغراض، ورؤية أوضح عند الركن.</p>
         </div>
       </section>
 
@@ -54,7 +61,23 @@ export default function CollectionPage() {
                     <span className="review-count">({p.reviewCount} تقييم)</span>
                   </div>
                   <h3>{p.name}</h3>
-                  <p className="product-benefit">{p.description}</p>
+                  <div className="product-benefit">
+                    <p>{p.shortBenefit}</p>
+                    {p.description && p.description.trim() !== p.shortBenefit?.trim() && (
+                      <>
+                        {descExpanded[p.id] && (
+                          <p style={{ marginTop: 10 }}>{p.description}</p>
+                        )}
+                        <button
+                          type="button"
+                          className="product-benefit-toggle"
+                          onClick={() => toggleDesc(p.id)}
+                        >
+                          {descExpanded[p.id] ? "طي الوصف" : "عرض الوصف الكامل"}
+                        </button>
+                      </>
+                    )}
+                  </div>
                   <div className="price-tiers">
                     <div className="price-tier-row">
                       <span className="price-tier-label">١ قطعة</span>

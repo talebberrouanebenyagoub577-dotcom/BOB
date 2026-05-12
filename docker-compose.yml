@@ -1,20 +1,18 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16-alpine
     container_name: nidhamauto_database
     restart: unless-stopped
     environment:
-      POSTGRES_USER: nidhamauto
-      POSTGRES_PASSWORD: nidhamauto
-      POSTGRES_DB: nidhamauto
+      POSTGRES_USER: ${POSTGRES_USER:-nidhamauto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nidhamauto}
+      POSTGRES_DB: ${POSTGRES_DB:-nidhamauto}
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nidhamauto"]
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -25,14 +23,36 @@ services:
     restart: unless-stopped
     env_file: ./backend/.env
     environment:
-      DATABASE_URL: postgresql+asyncpg://nidhamauto:nidhamauto@db:5432/nidhamauto
-      GOOGLE_SHEETS_WEBHOOK_URL: https://script.google.com/macros/s/AKfycbx5XizlWyjag71nA_0DRo1XqaBg-qfKjYcbKi1OvbkGNhQaGxKPpyKTQ0iYhJRlJ0Re/exec
+      # داخل Docker شبكة Postgres اسمها "db"; التطوير على المضيف يستخدم 127.0.0.1 في .env.
+      POSTGRES_HOST: db
+      # يجب مطابقة كلمة مرور مستخدم قاعدة البيانات مع خدمة db (نفس ${POSTGRES_PASSWORD} في جذر المشروع).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nidhamauto}
+      POSTGRES_USER: ${POSTGRES_USER:-nidhamauto}
+      POSTGRES_DB: ${POSTGRES_DB:-nidhamauto}
+      POSTGRES_PORT: "5432"
+      GOOGLE_SHEETS_WEBHOOK_URL: https://script.google.com/macros/s/AKfycbysfd_ZhAEcpxUK0KbHoStIHqFM39UZiSNkPd492TI1Ca6hGej3yz07A03APoaXFDGH/exec
     ports:
       - "8000:8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4)",
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
     depends_on:
       db:
         condition: service_healthy
 
+  # Next يطبع "Local: http://HOSTNAME:PORT" — HOSTNAME هو اسم الحاوية وليس دومين الموقع.
+  # إذا ظهر لك :80 داخل اللوج فـ Next يستمع على 80؛ يجب مطابقة المنفذ يميناً مع نفس الرقم:
+  #   ports: "3000:80" و environment PORT: "80"
+  # وإلا يبقى compose على 3000:3000 مع PORT: "3000" (الافتراضي في Dockerfile).
   frontend:
     build: ./frontend
     container_name: nidhamauto_frontend
@@ -40,10 +60,13 @@ services:
     env_file: ./frontend/.env
     environment:
       NEXT_PUBLIC_API_URL: http://backend:8000
+      BACKEND_INTERNAL_URL: http://backend:8000
+      PORT: ${FRONTEND_INTERNAL_PORT:-3000}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PUBLISH_PORT:-3000}:${FRONTEND_INTERNAL_PORT:-3000}"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   pgweb:
     image: sosedoff/pgweb
@@ -52,7 +75,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      DATABASE_URL: postgres://nidhamauto:nidhamauto@db:5432/nidhamauto?sslmode=disable
+      DATABASE_URL: postgres://${POSTGRES_USER:-nidhamauto}:${POSTGRES_PASSWORD:-nidhamauto}@db:5432/${POSTGRES_DB:-nidhamauto}?sslmode=disable
     depends_on:
       db:
         condition: service_healthy

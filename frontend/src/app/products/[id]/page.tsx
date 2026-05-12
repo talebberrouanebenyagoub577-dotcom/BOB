@@ -7,25 +7,44 @@ import { UpsellModal } from "@/components/UpsellModal";
 import { OfferSelector } from "@/components/OfferSelector";
 import { PRODUCTS } from "@/data/products";
 
+import { ProductViewTracker } from "@/components/ProductViewTracker";
+import { BRAND, defaultSiteTitle } from "@/lib/brand";
+import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "@/lib/productDetailMedia";
+
+/** يمنع الاعتماد على نسخ HTML معادّة توليدها في بناء قديم كانت تُرجع 404 لـ /products/[id] */
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
 interface Props {
-  params: { id: string };
+  /** Next.js 15+ / 16: route params are async */
+  params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
   return PRODUCTS.map((p) => ({ id: p.id }));
 }
 
-export function generateMetadata({ params }: Props) {
-  const product = PRODUCTS.find((p) => p.id === params.id);
-  return { title: product ? `${product.nameAr} | نيدها اوتو` : "نيدها اوتو" };
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params;
+  const product = PRODUCTS.find((p) => p.id === id);
+  return {
+    title: product
+      ? { absolute: `${product.nameAr} | ${BRAND.nameAr}` }
+      : { absolute: defaultSiteTitle() },
+    description: product?.descriptionAr ?? BRAND.metaDescriptionAr,
+  };
 }
 
-export default function ProductPage({ params }: Props) {
-  const product = PRODUCTS.find((p) => p.id === params.id);
+export default async function ProductPage({ params }: Props) {
+  const { id } = await params;
+  const product = PRODUCTS.find((p) => p.id === id);
   if (!product) notFound();
+
+  const detailHeroSrc = getProductPageHeroUrl(product.id);
 
   return (
     <>
+      <ProductViewTracker sku={product.sku} productId={product.id} />
       <Header />
       <CartDrawer />
       <CheckoutPopup />
@@ -33,9 +52,14 @@ export default function ProductPage({ params }: Props) {
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Gallery */}
-          <div className="aspect-square bg-navy/5 rounded-2xl flex items-center justify-center text-8xl">
-            🛍️
+          {/* معرض صفحة المنتج — ملفات في /public/product-detail */}
+          <div className="aspect-[4/3] bg-navy/5 rounded-2xl overflow-hidden flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={detailHeroSrc ?? product.image}
+              alt={product.nameAr}
+              className="w-full h-full object-contain"
+            />
           </div>
 
           {/* Info */}
@@ -75,6 +99,36 @@ export default function ProductPage({ params }: Props) {
           </div>
         </div>
 
+        <section
+          className="mt-10 rounded-2xl overflow-hidden bg-navy/5"
+          aria-label="مجموعة نيدها أوتو — تنظيم، حماية الفراغ، ورؤية أوضح"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PRODUCT_PAGE_SHARED_SRC}
+            alt="حامي فراغ المقعد، منظّم ظهر المقعد، ومرايا الركن — مجموعة مقصورة نيدها أوتو"
+            className="w-full h-auto block"
+            loading="lazy"
+          />
+        </section>
+
+        <section
+          className="mt-10 grid gap-6 md:grid-cols-2"
+          aria-label="صور توضيحية للمنتجات"
+        >
+          {PRODUCT_PAGE_HIGHLIGHT_IMAGES.map((item) => (
+            <div key={item.src} className="rounded-2xl overflow-hidden bg-navy/5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.src}
+                alt={item.alt}
+                className="w-full h-auto block"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </section>
+
         {/* How it works */}
         <section className="mt-16">
           <h2 className="font-extrabold text-navy text-2xl mb-6 text-center">كيف يعمل؟</h2>
@@ -102,7 +156,7 @@ export default function ProductPage({ params }: Props) {
             {[
               { q: "هل التركيب سهل؟", a: "نعم، يتم في أقل من دقيقتين بدون أدوات." },
               { q: "هل يناسب جميع السيارات؟", a: "يناسب معظم السيارات اليابانية والكورية والأمريكية." },
-              { q: "ما سياسة الإرجاع؟", a: "إرجاع مجاني خلال 14 يوماً إذا لم تكوني راضية." },
+              { q: "ما سياسة الإرجاع؟", a: "إرجاع مجاني خلال 7 أيام وفق الشروط المعلنة إذا لم يكن المنتج مناسباً." },
             ].map((faq) => (
               <details key={faq.q} className="bg-navy/5 rounded-xl p-4">
                 <summary className="font-bold text-navy cursor-pointer list-none">{faq.q}</summary>

@@ -5,6 +5,7 @@ import type { Product } from "@/types";
 import { PRICE_TIERS } from "@/data/products";
 import { useCartStore } from "@/lib/store";
 import { trackAddToCart } from "@/lib/pixels";
+import { trackServerEvent } from "@/lib/serverTrack";
 
 interface Props {
   product: Product;
@@ -26,6 +27,7 @@ export function ProductCard({ product }: Props) {
   const handleBuy = () => {
     addItem(product, 1);
     trackAddToCart(product.id, product.price);
+    trackServerEvent("add_to_cart", { sku: product.sku, productId: product.id });
     openDrawer();
   };
 

@@ -1,0 +1,2 @@
+/* Scoped to admin page import only — no Tailwind preflight (avoids breaking storefront). */
+@tailwind utilities;

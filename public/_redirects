@@ -1,0 +1,3 @@
+# SPA fallback — Netlify-style; many static hosts copy this from public/ into dist/.
+# If your host ignores _redirects, use the nginx example in deploy/nginx-vite-spa-and-admin.example.conf
+/*    /index.html   200

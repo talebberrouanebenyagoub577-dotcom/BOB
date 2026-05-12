@@ -1,10 +1,9 @@
 import random
 import string
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
-from sqlalchemy import select, desc, text
+from sqlalchemy import select, desc, text, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -15,27 +14,25 @@ from app.schemas.order import OrderIn, OrderOut
 from app.services.tracking import fire_all_capi
 from app.services.webhook import send_to_sheets
 from app.services.geo import is_saudi_ip
+from app.services.traffic_intel import classify_visitor_ip
+from app.deps.admin_auth import verify_admin
+from app.date_range import RIYADH, riyadh_day_range_utc
+from app.http_client_ip import client_ip_from_request
 
 router = APIRouter()
-
-
-def _get_client_ip(request: Request) -> str:
-    """Get real client IP — handles Cloudflare CF-Connecting-IP and X-Forwarded-For."""
-    cf_ip = request.headers.get("CF-Connecting-IP")
-    if cf_ip:
-        return cf_ip.strip()
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else ""
 
 
 def _is_whitelisted(phone: str) -> bool:
     allowed = [p.strip() for p in settings.WHITELISTED_PHONES.split(",") if p.strip()]
     normalized = phone.strip().replace("+966", "0").replace("966", "0", 1)
     for p in allowed:
+        if phone.strip() == p:
+            return True
         p_norm = p.replace("+966", "0").replace("966", "0", 1)
-        if normalized == p_norm or phone == p:
+        if normalized == p_norm:
+            return True
+        # Short whitelist prefix (e.g. +966550603) matches full 05xxxxxxxx numbers
+        if 7 <= len(p_norm) < 10 and normalized.startswith(p_norm):
             return True
     return False
 
@@ -62,6 +59,7 @@ def _phone_sheet_format(phone_05: str) -> str:
 
 
 @router.post("/order", response_model=OrderOut)
+@router.post("/api/orders", response_model=OrderOut)
 async def create_order(
     request: Request,
     body: OrderIn,
@@ -70,11 +68,13 @@ async def create_order(
 ) -> OrderOut:
     # Block non-KSA orders unless phone is whitelisted
     if not _is_whitelisted(body.phone):
-        client_ip = _get_client_ip(request)
+        client_ip = client_ip_from_request(request)
         if not await is_saudi_ip(client_ip):
             raise HTTPException(status_code=403, detail="الخدمة متاحة داخل المملكة العربية السعودية فقط")
 
     order_number = _generate_order_number()
+    client_ip = client_ip_from_request(request)
+    verdict = await classify_visitor_ip(client_ip)
 
     order = Order(
         order_number=order_number,
@@ -85,6 +85,9 @@ async def create_order(
         upsell_accepted=body.upsell_accepted,
         upsell_sku=body.upsell_sku,
         event_id=body.event_id,
+        client_ip=client_ip[:45] if client_ip else None,
+        traffic_valid=verdict.is_valid_ksa,
+        session_id=(body.session_id[:64] if body.session_id else None),
     )
     for item in body.items:
         order.items.append(
@@ -111,7 +114,7 @@ async def create_order(
 
     # Google Sheet row — match header: date,orderid,country,name,phone,product,sku,quantity,totalprix,currency,status
     sheet_payload = {
-        "date": datetime.now(ZoneInfo("Asia/Riyadh")).strftime("%d/%m/%Y"),
+        "date": datetime.now(RIYADH).strftime("%d/%m/%Y"),
         "orderid": order_number,
         "country": "KSA",
         "name": body.name,
@@ -140,11 +143,9 @@ async def create_order(
 
 @router.delete("/admin/orders/clear")
 async def clear_orders(
-    token: str = Query(...),
+    _: None = Depends(verify_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    if token != settings.SECRET_KEY and token != "nidham2026":
-        raise HTTPException(status_code=403, detail="forbidden")
     await db.execute(text("DELETE FROM tracking_events"))
     await db.execute(text("DELETE FROM order_items"))
     await db.execute(text("DELETE FROM orders"))
@@ -154,19 +155,36 @@ async def clear_orders(
 
 @router.get("/admin/orders")
 async def list_orders(
-    token: str = Query(...),
-    limit: int = Query(50, le=200),
+    _: None = Depends(verify_admin),
+    limit: int = Query(50, le=500),
+    from_date: str | None = Query(None, description="YYYY-MM-DD Riyadh range start"),
+    to_date: str | None = Query(None, description="YYYY-MM-DD Riyadh range end (inclusive)"),
+    valid_only: bool = Query(False),
+    q: str | None = Query(None, description="Search order number, phone fragment, or name"),
     db: AsyncSession = Depends(get_db),
 ):
-    if token != settings.SECRET_KEY and token != "nidham2026":
-        raise HTTPException(status_code=403, detail="forbidden")
+    stmt = select(Order).options(selectinload(Order.items))
 
-    result = await db.execute(
-        select(Order)
-        .options(selectinload(Order.items))
-        .order_by(desc(Order.created_at))
-        .limit(limit)
-    )
+    if from_date or to_date:
+        fd = from_date or to_date or ""
+        td = to_date or from_date or ""
+        start_utc, end_excl_utc = riyadh_day_range_utc(fd, td)
+        stmt = stmt.where(Order.created_at >= start_utc, Order.created_at < end_excl_utc)
+
+    if valid_only:
+        stmt = stmt.where(Order.traffic_valid.is_(True))
+
+    if q and q.strip():
+        needle = f"%{q.strip()}%"
+        stmt = stmt.where(
+            or_(
+                Order.order_number.ilike(needle),
+                Order.phone.ilike(needle),
+                Order.name.ilike(needle),
+            )
+        )
+
+    result = await db.execute(stmt.order_by(desc(Order.created_at)).limit(limit))
     orders = result.scalars().all()
 
     return [
@@ -179,8 +197,16 @@ async def list_orders(
             "status": o.status,
             "upsell_accepted": o.upsell_accepted,
             "upsell_sku": o.upsell_sku,
+            "traffic_valid": o.traffic_valid,
+            "client_ip": o.client_ip,
+            "session_id": o.session_id,
             "items": [
-                {"sku": i.sku, "qty": i.qty, "unit_price": i.unit_price}
+                {
+                    "sku": i.sku,
+                    "qty": i.qty,
+                    "unit_price": i.unit_price,
+                    "name_ar": PRODUCT_NAMES_BY_SKU.get(i.sku, i.sku),
+                }
                 for i in o.items
             ],
             "created_at": o.created_at.isoformat(),

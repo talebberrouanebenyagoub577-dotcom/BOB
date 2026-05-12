@@ -25,6 +25,9 @@ class Order(Base):
     event_id: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    client_ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
+    traffic_valid: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     items: Mapped[list["OrderItem"]] = relationship(back_populates="order", cascade="all, delete-orphan")
 

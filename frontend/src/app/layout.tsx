@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import { PixelLoader } from "@/components/PixelLoader";
+import { RouteAnalytics } from "@/components/RouteAnalytics";
+
+import { BRAND, defaultSiteTitle } from "@/lib/brand";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -11,9 +15,20 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "نيدها اوتو | Nidha Mauto",
-  description: "منتجات السيارات للمرأة السعودية — COD — توصيل سريع",
-  metadataBase: new URL("https://nidhamauto.shop"),
+  title: {
+    default: defaultSiteTitle(),
+    template: `%s | ${BRAND.nameAr}`,
+  },
+  description: BRAND.metaDescriptionAr,
+  metadataBase: new URL(BRAND.domain),
+  openGraph: {
+    title: defaultSiteTitle(),
+    description: BRAND.metaDescriptionAr,
+    locale: "ar_SA",
+    siteName: BRAND.nameAr,
+    type: "website",
+    url: BRAND.domain,
+  },
 };
 
 export default function RootLayout({
@@ -24,6 +39,9 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={cairo.variable}>
       <body className={cairo.className}>
+        <Suspense fallback={null}>
+          <RouteAnalytics />
+        </Suspense>
         {children}
         <PixelLoader />
       </body>

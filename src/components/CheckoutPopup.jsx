@@ -37,7 +37,15 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
-    if (!isValid) return;
+    if (!isValid) {
+      const id = errors.name ? "co-name" : "co-phone";
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        el?.scrollIntoView({ block: "center", behavior: "smooth" });
+        el?.focus({ preventScroll: true });
+      });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -63,7 +71,12 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
         onClick={handleClose}
         aria-hidden={!isCheckoutOpen}
       />
-      <section className={`checkout-popup ${isCheckoutOpen ? "open" : ""}`} role="dialog" aria-modal="true">
+      <section
+        className={`checkout-popup ${isCheckoutOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="popup-header">
           <div>
@@ -132,8 +145,9 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
               <button
                 type="submit"
                 className="btn btn-gold btn-full btn-lg"
-                style={{ marginTop: 16 }}
+                style={{ marginTop: 16, opacity: loading ? 0.85 : 1 }}
                 disabled={loading}
+                aria-busy={loading}
               >
                 {loading ? (
                   <span>⏳ جاري المعالجة...</span>

@@ -10,20 +10,22 @@ function TierInfo({ itemCount }) {
 
 export default function CartDrawer() {
   const {
-    isDrawerOpen, closeDrawer, openCheckout,
+    isDrawerOpen, isCheckoutOpen, closeDrawer, openCheckout,
     cartItems, crossSellProducts, subtotal, checkoutTotal,
     addToCart, incrementItem, decrementItem, removeItem,
     itemCount,
   } = useCart();
 
+  const drawerVisible = isDrawerOpen && !isCheckoutOpen;
+
   return (
     <>
       <div
-        className={`overlay ${isDrawerOpen ? "visible" : ""}`}
+        className={`overlay ${drawerVisible ? "visible" : ""}`}
         onClick={closeDrawer}
-        aria-hidden={!isDrawerOpen}
+        aria-hidden={!drawerVisible}
       />
-      <aside className={`drawer ${isDrawerOpen ? "open" : ""}`} aria-label="سلة التسوق">
+      <aside className={`drawer ${drawerVisible ? "open" : ""}`} aria-label="سلة التسوق">
         {/* Header */}
         <div className="drawer-header">
           <h2>

@@ -6,13 +6,20 @@ const config: Config = {
     extend: {
       colors: {
         navy: {
-          DEFAULT: "#0F1B2D",
-          light: "#1a2d47",
+          DEFAULT: "#0B1628",
+          light: "#152A45",
         },
         gold: {
-          DEFAULT: "#C9962A",
-          light: "#e0b444",
-          pale: "#f5e8c0",
+          DEFAULT: "#C9A24D",
+          light: "#D4B465",
+          pale: "#F5ECD8",
+        },
+        cream: {
+          DEFAULT: "#F6F4EF",
+        },
+        trust: {
+          DEFAULT: "#15803D",
+          pale: "#DCFCE7",
         },
       },
       fontFamily: {

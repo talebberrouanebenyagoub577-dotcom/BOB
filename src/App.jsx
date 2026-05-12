@@ -12,6 +12,7 @@ import CheckoutPopup from "./components/CheckoutPopup";
 import UpsellOfferModal from "./components/UpsellOfferModal";
 import ThankYouPage from "./components/ThankYouPage";
 
+import AdminDashboardPage from "./pages/AdminDashboard";
 import HomePage from "./pages/HomePage";
 import CollectionPage from "./pages/CollectionPage";
 import ProductPage from "./pages/ProductPage";
@@ -42,7 +43,7 @@ function ScrollToTop() {
 }
 
 function Storefront() {
-  const { clearCart } = useCart();
+  const { clearCart, closeCheckout, closeDrawer } = useCart();
   const upsellPrice = getUpsellPrice();
 
   const [checkoutPayload, setCheckoutPayload] = useState(null);
@@ -121,6 +122,8 @@ function Storefront() {
     const candidate = getUpsellCandidate(items);
     if (candidate && !upsellSeen) {
       localStorage.setItem(UPSELL_KEY, "1");
+      closeCheckout();
+      closeDrawer();
       setUpsellOffer(candidate);
       setIsUpsellOpen(true);
       return;
@@ -132,7 +135,7 @@ function Storefront() {
     return (
       <>
         <Header />
-        <ThankYouPage order={finalOrder} />
+        <ThankYouPage order={finalOrder} onContinueShopping={() => setFinalOrder(null)} />
         <Footer />
       </>
     );
@@ -199,9 +202,18 @@ function Storefront() {
 export default function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
-        <Storefront />
-      </CartProvider>
+      <Routes>
+        {/* /admin/* so /admin/ with trailing slash still hits the dashboard (else /* can show storefront). */}
+        <Route path="/admin/*" element={<AdminDashboardPage />} />
+        <Route
+          path="/*"
+          element={
+            <CartProvider>
+              <Storefront />
+            </CartProvider>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }

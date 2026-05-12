@@ -37,8 +37,13 @@ export default function UpsellOfferModal({
 
   return (
     <>
-      <div className={`popup-overlay ${isOpen ? "visible" : ""}`} aria-hidden={!isOpen} />
-      <section className={`upsell-modal ${isOpen ? "open" : ""}`} role="dialog" aria-modal="true">
+      <div className={`upsell-overlay ${isOpen ? "visible" : ""}`} aria-hidden={!isOpen} />
+      <section
+        className={`upsell-modal ${isOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="upsell-inner">
           <div className="upsell-badge">⚡ عرض حصري لطلبك فقط</div>
 

@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply bg-white text-navy;
+    @apply bg-cream text-navy;
     -webkit-font-smoothing: antialiased;
   }
 

@@ -1,3 +1,4 @@
+# Windows/local: use Python 3.11 or 3.12 (prebuilt wheels). Python 3.14 often forces source builds for asyncpg/pydantic-core and requires MSVC (link.exe).
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
 sqlalchemy[asyncio]==2.0.30
@@ -7,3 +8,5 @@ pydantic==2.7.1
 pydantic-settings==2.2.1
 httpx==0.27.0
 python-dotenv==1.0.1
+PyJWT==2.8.0
+tzdata>=2024.1

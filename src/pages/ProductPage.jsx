@@ -1,6 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { PRODUCTS, CROSS_SELL_MAP } from "../data/products";
+import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "../data/productDetailMedia";
 import { useCart } from "../store/cartStore";
 
 const PRICING = [
@@ -43,6 +44,9 @@ export default function ProductPage() {
   const crossSellIds = CROSS_SELL_MAP[product.id] ?? [];
   const crossSellProducts = crossSellIds.map((cid) => PRODUCTS.find((p) => p.id === cid)).filter(Boolean);
 
+  const selectedTier = PRICING.find((t) => t.qty === selectedQty) ?? PRICING[0];
+  const detailHeroSrc = getProductPageHeroUrl(product.id);
+
   const handleBuy = () => {
     for (let i = 0; i < selectedQty; i++) {
       addToCart(product.id);
@@ -65,8 +69,11 @@ export default function ProductPage() {
           <div className="product-page-grid">
             {/* Gallery */}
             <div className="product-gallery">
-              <div className="main-img">
-                <img src={product.image} alt={product.name} />
+              <div className={`main-img ${detailHeroSrc ? "main-img--detail-hero" : ""}`}>
+                <img
+                  src={detailHeroSrc ?? product.image}
+                  alt={product.name}
+                />
                 <span className="product-badge-lg">{product.badge}</span>
               </div>
             </div>
@@ -86,6 +93,31 @@ export default function ProductPage() {
               <h1 className="product-title">{product.name}</h1>
               <p className="product-sub">{product.description}</p>
 
+              {Array.isArray(product.longDescription) && product.longDescription.length > 0 && (
+                <div className="product-story">
+                  {product.longDescription.map((para, i) => (
+                    <p key={i} className="product-story-p">{para}</p>
+                  ))}
+                </div>
+              )}
+
+              {Array.isArray(product.whatsInBox) && product.whatsInBox.length > 0 && (
+                <div className="product-inbox-section">
+                  <h3>ما الذي يصلك مع الطلب؟</h3>
+                  <ul className="product-inbox-list">
+                    {product.whatsInBox.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {product.idealFor && (
+                <p className="product-ideal">
+                  <strong>لمن يناسب؟</strong> {product.idealFor}
+                </p>
+              )}
+
               {/* Scarcity */}
               <div className="scarcity-line">
                 <span className="scarcity-dot" />
@@ -95,9 +127,11 @@ export default function ProductPage() {
               {/* Price Box */}
               <div className="price-box">
                 <div className="price-main">
-                  <span className="price-amount">199</span>
+                  <span className="price-amount">{selectedTier.price}</span>
                   <span className="price-currency">ر.س</span>
-                  <span style={{ fontSize: 13, color: "var(--gray-400)", marginRight: 4 }}>/ قطعة</span>
+                  <span style={{ fontSize: 13, color: "var(--gray-400)", marginRight: 4 }}>
+                    {selectedQty === 1 ? "· قطعة واحدة" : `· ${selectedQty} قطع`}
+                  </span>
                 </div>
                 <div className="price-tier-list">
                   {PRICING.map((tier) => (
@@ -177,6 +211,28 @@ export default function ProductPage() {
               )}
             </div>
           </div>
+
+          <section
+            className="product-pdp-shared-visual"
+            aria-label="مجموعة نيدها أوتو — تنظيم، حماية الفراغ، ورؤية أوضح"
+          >
+            <img
+              src={PRODUCT_PAGE_SHARED_SRC}
+              alt="حامي فراغ المقعد، منظّم ظهر المقعد، ومرايا الركن — مجموعة مقصورة نيدها أوتو"
+              loading="lazy"
+            />
+          </section>
+
+          <section
+            className="product-pdp-highlight-grid"
+            aria-label="صور توضيحية للمنتجات"
+          >
+            {PRODUCT_PAGE_HIGHLIGHT_IMAGES.map((item) => (
+              <div key={item.src} className="product-pdp-highlight-cell">
+                <img src={item.src} alt={item.alt} loading="lazy" />
+              </div>
+            ))}
+          </section>
         </div>
       </section>
 
@@ -203,7 +259,7 @@ export default function ProductPage() {
                     <h3>{cp.name}</h3>
                     <p className="product-benefit">{cp.shortBenefit}</p>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                      <span style={{ fontSize: 24, fontWeight: 900, color: "var(--navy)" }}>199</span>
+                      <span style={{ fontSize: 24, fontWeight: 900, color: "var(--navy)" }}>{cp.price}</span>
                       <span style={{ fontSize: 14, color: "var(--gray-600)" }}>ر.س</span>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
@@ -225,8 +281,8 @@ export default function ProductPage() {
       {/* Sticky CTA bar (mobile only, shown via CSS) */}
       <div className="sticky-cta-bar">
         <div>
-          <div className="sticky-price">199 ر.س</div>
-          <div className="sticky-sub">الدفع عند الاستلام</div>
+          <div className="sticky-price">{selectedTier.price} ر.س</div>
+          <div className="sticky-sub">الدفع عند الاستلام · {selectedQty === 1 ? "قطعة" : `${selectedQty} قطع`}</div>
         </div>
         <button className="btn btn-gold" onClick={handleBuy} type="button">
           اشتري الآن ←

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { PRODUCTS } from "../data/products";
 import { useCart } from "../store/cartStore";
 import { useState } from "react";
+import { BRAND } from "../brand.js";
 
 const REVIEWS = [
   {
@@ -69,20 +70,20 @@ export default function HomePage() {
       <section className="hero">
         <div style={{ position: "relative", zIndex: 1 }}>
           <div className="hero-badge">
-            <span>⚡</span>
-            <span>منتجات مختبرة للقيادة في السعودية</span>
+            <span>✓</span>
+            <span>إكسسوارات مقصورة مختارة — ثقة ووضوح</span>
           </div>
           <h1>
-            ثلاث مشاكل يومية<br />
-            <span>حل واحد بسيط</span>
+            مقصورة أنظف…<br />
+            <span>قيادة أوثق</span>
           </h1>
           <p>
-            منظّم المقعد، حامي الفراغ، وطقم المرايا — منظومة مختارة لتحل أكثر
-            مشاكل القيادة اليومية إزعاجاً. تركيب فوري والدفع عند الاستلام.
+            {BRAND.nameAr} تجمع لك منظّم المقعد، حامي فراغ المقعد، وطقم مرايا الركن — لحلّ الفوضى
+            داخل السيارة وقلق المواقف الضيقة، مع الدفع عند الاستلام والتوصيل داخل المملكة.
           </p>
           <div className="hero-cta">
             <Link to="/collection" className="btn btn-gold btn-lg">
-              اكتشف المنظومة ←
+              اكتشف المجموعة ←
             </Link>
             <Link to="/about" className="btn btn-outline">
               من نحن
@@ -192,7 +193,7 @@ export default function HomePage() {
       <section className="section" style={{ background: "var(--gray-50)" }}>
         <div className="container">
           <div className="section-header section-header--center">
-            <span className="section-tag">لماذا نيدها اوتو</span>
+            <span className="section-tag">لماذا {BRAND.nameAr}</span>
             <h2 className="section-title">ثقتك تهمنا</h2>
           </div>
           <div className="trust-grid">
@@ -226,7 +227,7 @@ export default function HomePage() {
           <div className="section-header section-header--center">
             <span className="section-tag">آراء عملائنا</span>
             <h2 className="section-title">ماذا قالوا عنّا</h2>
-            <p className="section-sub">أكثر من 600 عميل راضٍ في المملكة العربية السعودية</p>
+            <p className="section-sub">تجارب عملاء يشاركونا انطباعهم بعد استخدام الإكسسوارات في يومهم.</p>
           </div>
           <div className="reviews-grid">
             {REVIEWS.map((r, i) => (

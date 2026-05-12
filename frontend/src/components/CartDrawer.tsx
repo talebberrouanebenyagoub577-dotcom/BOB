@@ -3,6 +3,7 @@
 import { useCartStore } from "@/lib/store";
 import { PRODUCTS } from "@/data/products";
 import { trackInitiateCheckout } from "@/lib/pixels";
+import { trackServerEvent } from "@/lib/serverTrack";
 import clsx from "clsx";
 
 export function CartDrawer() {
@@ -21,6 +22,7 @@ export function CartDrawer() {
   const handleCheckout = () => {
     closeDrawer();
     trackInitiateCheckout(total());
+    trackServerEvent("initiate_checkout", { value: total() });
     openCheckout();
   };
 
@@ -113,6 +115,11 @@ export function CartDrawer() {
                     <button
                       onClick={() => {
                         useCartStore.getState().addItem(p, 1);
+                        trackServerEvent("add_to_cart", {
+                          sku: p.sku,
+                          productId: p.id,
+                          source: "cart_cross_sell",
+                        });
                       }}
                       className="text-xs bg-navy text-white font-bold rounded-lg px-2 py-1.5 hover:bg-navy/80 transition-colors"
                     >

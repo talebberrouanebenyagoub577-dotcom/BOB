@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../store/cartStore";
+import { BRAND } from "../brand.js";
 
 export default function Header() {
   const { itemCount, openDrawer } = useCart();
@@ -21,8 +22,8 @@ export default function Header() {
             <span className="logo-letter">N</span>
           </div>
           <div className="logo-text">
-            <span className="logo-ar">نيدها اوتو</span>
-            <span className="logo-en">nidha mauto</span>
+            <span className="logo-ar">{BRAND.nameAr}</span>
+            <span className="logo-en">{BRAND.nameEn}</span>
           </div>
         </Link>
 

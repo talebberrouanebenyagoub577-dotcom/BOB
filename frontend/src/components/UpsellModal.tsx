@@ -10,6 +10,7 @@ const COUNTDOWN_SECONDS = 12;
 export function UpsellModal() {
   const { items, isUpsellOpen, closeUpsell } = useCartStore();
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [error, setError] = useState("");
 
   const cartSkus = new Set(items.map((i) => i.product.sku));
   const upsellProduct = PRODUCTS.find((p) => !cartSkus.has(p.sku));
@@ -34,33 +35,47 @@ export function UpsellModal() {
   }, [isUpsellOpen]);
 
   const finalize = async (accepted: boolean) => {
-    closeUpsell();
+    setError("");
     const raw = sessionStorage.getItem("pending_order");
     if (!raw) return;
 
+    const pending = JSON.parse(raw) as {
+      total: number;
+      event_id: string;
+      session_id?: string;
+      items: { sku: string; qty: number; unit_price: number; name_ar: string }[];
+      [key: string]: unknown;
+    };
+    const upsellDelta = accepted && upsellProduct ? UPSELL_PRICE : 0;
     const payload = {
-      ...JSON.parse(raw),
+      ...pending,
+      total: pending.total + upsellDelta,
       upsell_accepted: accepted,
       upsell_sku: accepted && upsellProduct ? upsellProduct.sku : undefined,
+      upsell_name_ar: accepted && upsellProduct ? upsellProduct.nameAr : undefined,
     };
 
     // Fire Purchase pixel
-    const skus = payload.items.map((i: { sku: string }) => i.sku);
+    const skus = payload.items.map((i) => i.sku);
     if (accepted && upsellProduct) skus.push(upsellProduct.sku);
-    const value = payload.total + (accepted ? UPSELL_PRICE : 0);
-    trackPurchase(payload.event_id, value, skus);
+    const value = payload.total;
+    trackPurchase(String(payload.event_id), value, skus);
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/order`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-    } catch { /* silent */ }
+      const res = await fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("order failed");
+      const data = await res.json();
+      sessionStorage.setItem("last_order", JSON.stringify({ ...payload, ...data }));
+    } catch {
+      setError("حدث خطأ في إرسال الطلب، يرجى المحاولة مرة أخرى");
+      return;
+    }
 
+    closeUpsell();
     useCartStore.getState().clearCart();
     window.location.href = "/thank-you";
   };
@@ -116,6 +131,10 @@ export function UpsellModal() {
             لا شكراً، لست مهتمة
           </button>
         </div>
+
+        {error && (
+          <p className="text-red-500 text-sm font-bold text-center">{error}</p>
+        )}
       </div>
     </div>
   );

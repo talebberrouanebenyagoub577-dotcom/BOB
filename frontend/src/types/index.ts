@@ -34,10 +34,11 @@ export interface CartItem {
 export interface OrderPayload {
   name: string;
   phone: string; // 05XXXXXXXX
-  items: { sku: string; qty: number; unit_price: number }[];
+  items: { sku: string; qty: number; unit_price: number; name_ar: string }[];
   total: number;
   upsell_accepted: boolean;
   upsell_sku?: string;
+  upsell_name_ar?: string;
   event_id: string;
 }
 

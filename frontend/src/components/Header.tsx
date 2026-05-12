@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCartStore } from "@/lib/store";
+import { BRAND } from "@/lib/brand";
 
 export function Header() {
   const { items, openDrawer } = useCartStore();
@@ -11,15 +12,17 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-navy text-white shadow-md">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo — RTL start = right side */}
-        <Link href="/" className="flex items-center gap-3">
-          {/* N in gold circle */}
-          <span className="w-10 h-10 rounded-full bg-gold flex items-center justify-center font-black text-white text-xl select-none">
+        <Link href="/" className="flex items-center gap-3 group" aria-label={`${BRAND.nameAr} — الرئيسية`}>
+          <span className="w-10 h-10 rounded-full bg-gold flex items-center justify-center font-black text-navy text-xl select-none group-hover:ring-2 group-hover:ring-gold-light/50 transition-shadow">
             N
           </span>
-          <span className="font-extrabold text-lg leading-tight">
-            <span className="block text-white">نيدها اوتو</span>
-            <span className="block text-gold text-xs font-medium tracking-wide">
-              Nidha Mauto
+          <span className="font-extrabold text-lg leading-tight text-right">
+            <span className="block text-white">{BRAND.nameAr}</span>
+            <span className="block text-gold/90 text-[11px] font-semibold tracking-wide">
+              {BRAND.nameEn}
+            </span>
+            <span className="hidden sm:block text-white/45 text-[10px] font-medium normal-case tracking-normal mt-0.5 max-w-[11rem]">
+              {BRAND.taglineAr}
             </span>
           </span>
         </Link>
@@ -33,7 +36,7 @@ export function Header() {
             من نحن
           </Link>
           <Link href="/contact" className="hover:text-gold transition-colors">
-            تواصلي معنا
+            تواصل معنا
           </Link>
         </nav>
 

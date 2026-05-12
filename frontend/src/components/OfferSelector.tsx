@@ -5,6 +5,7 @@ import type { Product } from "@/types";
 import { PRICE_TIERS, getTierPrice } from "@/data/products";
 import { useCartStore } from "@/lib/store";
 import { trackAddToCart } from "@/lib/pixels";
+import { trackServerEvent } from "@/lib/serverTrack";
 import clsx from "clsx";
 
 interface Props {
@@ -20,6 +21,12 @@ export function OfferSelector({ product }: Props) {
   const handleBuy = () => {
     addItem(product, selectedQty);
     trackAddToCart(product.id, price);
+    trackServerEvent("add_to_cart", {
+      sku: product.sku,
+      productId: product.id,
+      qty: selectedQty,
+      revenue: price,
+    });
     openDrawer();
   };
 
