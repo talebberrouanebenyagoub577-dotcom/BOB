@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-label="Seat gap protector">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#152A45"/>
+      <stop offset="100%" stop-color="#0B1628"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#g)"/>
+  <rect x="32" y="240" width="416" height="4" fill="#C9A24D" opacity="0.85"/>
+  <text x="240" y="168" fill="#F6F4EF" font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="26" font-weight="700" text-anchor="middle">Seat gap protector</text>
+  <text x="240" y="208" fill="#C9A24D" font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="15" text-anchor="middle">Placeholder — replace with product photo</text>
+</svg>
