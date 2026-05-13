@@ -3,6 +3,9 @@ import { useState } from "react";
 import { PRODUCTS, CROSS_SELL_MAP } from "../data/products";
 import { getProductPageHeroUrl } from "../data/productDetailMedia";
 import { useCart } from "../store/cartStore";
+import { ParkingMirrorStoryVite } from "../components/ParkingMirrorStoryVite";
+import { SeatOrganizerStoryVite } from "../components/SeatOrganizerStoryVite";
+import { SeatGapProtectorStoryVite } from "../components/SeatGapProtectorStoryVite";
 
 const PRICING = [
   { qty: 1, price: 199, label: "قطعة واحدة", save: null },
@@ -69,7 +72,17 @@ export default function ProductPage() {
           <div className="product-page-grid">
             {/* Gallery */}
             <div className="product-gallery">
-              <div className={`main-img ${detailHeroSrc ? "main-img--detail-hero" : ""}`}>
+              <div
+                className={`main-img ${
+                  product.id === "parking-mirror" ||
+                  product.id === "seat-organizer" ||
+                  product.id === "seatgap-protector"
+                    ? "main-img--detail-hero main-img--pdp-hero"
+                    : detailHeroSrc
+                      ? "main-img--detail-hero"
+                      : ""
+                }`}
+              >
                 <img
                   src={detailHeroSrc ?? product.image}
                   alt={product.name}
@@ -211,6 +224,10 @@ export default function ProductPage() {
               )}
             </div>
           </div>
+
+          {product.id === "parking-mirror" && <ParkingMirrorStoryVite />}
+          {product.id === "seat-organizer" && <SeatOrganizerStoryVite />}
+          {product.id === "seatgap-protector" && <SeatGapProtectorStoryVite />}
 
         </div>
       </section>

@@ -7,6 +7,7 @@
     font-family: var(--font-cairo), "Cairo", sans-serif;
     direction: rtl;
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   body {

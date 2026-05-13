@@ -6,6 +6,7 @@ import { PRICE_TIERS, getTierPrice } from "@/data/products";
 import { useCartStore } from "@/lib/store";
 import { trackAddToCart } from "@/lib/pixels";
 import { trackServerEvent } from "@/lib/serverTrack";
+import { useOptionalPdpQty } from "@/components/pdp/PdpQtyContext";
 import clsx from "clsx";
 
 interface Props {
@@ -13,9 +14,12 @@ interface Props {
 }
 
 export function OfferSelector({ product }: Props) {
-  const [selectedQty, setSelectedQty] = useState(1);
-  const { addItem, openDrawer } = useCartStore();
+  const optional = useOptionalPdpQty();
+  const inner = useState(1);
+  const selectedQty = optional ? optional.qty : inner[0];
+  const setSelectedQty = optional ? optional.setQty : inner[1];
 
+  const { addItem, openDrawer } = useCartStore();
   const price = getTierPrice(selectedQty);
 
   const handleBuy = () => {
@@ -31,27 +35,27 @@ export function OfferSelector({ product }: Props) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Tier selection */}
-      <div className="grid grid-cols-3 gap-3">
+    <div className="space-y-5" id="pdp-buy-zone">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {PRICE_TIERS.map((tier) => (
           <button
             key={tier.qty}
+            type="button"
             onClick={() => setSelectedQty(tier.qty)}
             className={clsx(
-              "rounded-xl border-2 p-3 text-center transition-all",
+              "rounded-xl border-2 p-3 sm:p-3.5 text-center transition-all",
               selectedQty === tier.qty
-                ? "border-gold bg-gold/10 text-navy"
-                : "border-navy/10 bg-white text-navy/60 hover:border-gold/50"
+                ? "border-gold bg-gold/12 text-navy shadow-sm ring-2 ring-gold/20"
+                : "border-navy/10 bg-white text-navy/60 hover:border-gold/40"
             )}
           >
-            <p className="font-black text-lg">{tier.qty}</p>
-            <p className="text-xs font-medium">
-              {tier.qty === 1 ? "قطعة" : tier.qty === 2 ? "قطعتين" : "قطع"}
+            <p className="font-black text-xl sm:text-2xl">{tier.qty}</p>
+            <p className="text-[11px] sm:text-xs font-bold text-navy/50">
+              {tier.qty === 1 ? "قطعة" : tier.qty === 2 ? "قطعتين" : "ثلاث قطع"}
             </p>
-            <p className="font-bold text-gold text-sm mt-1">{tier.price} ر.س</p>
+            <p className="font-bold text-gold text-base sm:text-lg mt-1">{tier.price} ر.س</p>
             {tier.saveAr && (
-              <p className="text-xs text-green-600 font-semibold mt-0.5">
+              <p className="text-[10px] sm:text-xs text-green-600 font-semibold mt-0.5">
                 {tier.saveAr}
               </p>
             )}
@@ -59,24 +63,24 @@ export function OfferSelector({ product }: Props) {
         ))}
       </div>
 
-      {/* Total */}
-      <div className="flex items-center justify-between bg-navy/5 rounded-xl p-3">
-        <span className="font-semibold text-navy/70">الإجمالي:</span>
-        <span className="font-extrabold text-gold text-xl">
-          {price} <span className="text-base">ر.س</span>
+      <div className="flex items-center justify-between bg-gradient-to-r from-navy/6 to-transparent rounded-xl p-4 border border-navy/10">
+        <span className="font-bold text-navy/65">المستحق عند توصيلك:</span>
+        <span className="font-black text-gold text-2xl tabular-nums">
+          {price} <span className="text-lg">ر.س</span>
         </span>
       </div>
 
-      {/* CTA */}
-      <button onClick={handleBuy} className="btn-gold w-full text-xl py-5">
-        اشتري الآن — {price} ر.س
+      <button type="button" onClick={handleBuy} className="btn-gold w-full text-xl py-5 md:py-5">
+        إضافة للسلة — الدفع عند الاستلام
       </button>
 
-      {/* Trust chips */}
-      <div className="grid grid-cols-2 gap-2 text-xs text-navy/60 font-medium">
-        {["🚚 توصيل سريع", "💰 الدفع عند الاستلام", "🔄 إرجاع مجاني", "✅ ضمان الجودة"].map((t) => (
-          <span key={t} className="flex items-center gap-1">{t}</span>
-        ))}
+      <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-[11px] md:text-xs text-navy/55 font-bold">
+        <span className="rounded-full bg-navy/[0.05] px-3 py-1 border border-navy/10">
+          ☎ تأكيد هاتفي قبل الشحن
+        </span>
+        <span className="rounded-full bg-navy/[0.05] px-3 py-1 border border-navy/10">
+          🛡️ ضمان ذهبي ٣٠ يوم
+        </span>
       </div>
     </div>
   );

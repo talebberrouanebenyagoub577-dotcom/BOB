@@ -6,11 +6,25 @@ import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { OfferSelector } from "@/components/OfferSelector";
 import { PRODUCTS } from "@/data/products";
+import { PDP_EXTRAS } from "@/data/pdpExtras";
 
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { BRAND, defaultSiteTitle } from "@/lib/brand";
 import { getProductPageHeroUrl } from "@/lib/bundledProductMedia";
 import { catalogMainSurfaceStyle } from "@/lib/catalogSurfaceStyle";
+import { PARKING_MIRROR_STORY_BLOCKS } from "@/data/parkingMirrorPdp";
+import { SEAT_ORGANIZER_STORY_BLOCKS } from "@/data/seatOrganizerPdp";
+import { SEATGAP_STORY_BLOCKS } from "@/data/seatgapPdp";
+import { ProductPdpZigzag } from "@/components/ProductPdpZigzag";
+import { ProductPdpShell } from "@/components/pdp/ProductPdpShell";
+import { PdpTrustRibbon } from "@/components/pdp/PdpTrustRibbon";
+import { PdpPainBullets } from "@/components/pdp/PdpPainBullets";
+import { PdpTestimonialsStrip } from "@/components/pdp/PdpTestimonialsStrip";
+import { PdpScienceStrip } from "@/components/pdp/PdpScienceStrip";
+import { PdpCodPathStrip } from "@/components/pdp/PdpCodPathStrip";
+import { PdpProductFaq } from "@/components/pdp/PdpProductFaq";
+import { PdpFinalConfidence } from "@/components/pdp/PdpFinalConfidence";
+import type { ProductId } from "@/types";
 
 /** يمنع الاعتماد على نسخ HTML معادّة توليدها في بناء قديم كانت تُرجع 404 لـ /products/[id] */
 export const dynamic = "force-dynamic";
@@ -36,12 +50,38 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+function storyBlocks(productId: ProductId) {
+  switch (productId) {
+    case "parking-mirror":
+      return PARKING_MIRROR_STORY_BLOCKS;
+    case "seat-organizer":
+      return SEAT_ORGANIZER_STORY_BLOCKS;
+    case "seatgap-protector":
+      return SEATGAP_STORY_BLOCKS;
+    default:
+      return [];
+  }
+}
+
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
   const product = PRODUCTS.find((p) => p.id === id);
   if (!product) notFound();
 
+  const extras = PDP_EXTRAS[product.id as ProductId];
+  const blocks = storyBlocks(product.id);
   const detailHeroSrc = getProductPageHeroUrl(product.id);
+  const heroSrc = detailHeroSrc ?? product.image;
+
+  const isWidePdpHero =
+    product.id === "parking-mirror" ||
+    product.id === "seat-organizer" ||
+    product.id === "seatgap-protector";
+
+  const stockLabel =
+    product.stock <= 5
+      ? `🔥 بقي ${product.stock} من دفعات الأسبوع — العرض يحمى بالتأكيد الهاتفي`
+      : `متوفر للطلب الآن مع تأكيد سريع — الكميات تُدار أسبوعياً`;
 
   return (
     <>
@@ -51,100 +91,120 @@ export default async function ProductPage({ params }: Props) {
       <CheckoutPopup />
       <UpsellModal />
 
-      <main className="w-full pb-14" style={catalogMainSurfaceStyle}>
-        <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* معرض صفحة المنتج — صورة المنتج الحالي فقط */}
-          <div className="aspect-[4/3] bg-navy/5 rounded-2xl overflow-hidden flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={detailHeroSrc ?? product.image}
-              alt={product.nameAr}
-              className="w-full h-full object-contain"
-            />
-          </div>
+      <ProductPdpShell product={product}>
+        <main className="w-full pb-4" style={catalogMainSurfaceStyle}>
+          <div className="max-w-6xl mx-auto px-4 py-8 md:py-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-start">
+              <div
+                className={`rounded-3xl bg-gradient-to-br from-navy/[0.04] via-white to-gold/[0.06] border border-navy/10 shadow-sm overflow-hidden ${
+                  isWidePdpHero
+                    ? "aspect-[15/10] xl:max-h-[540px]"
+                    : "aspect-[4/3] lg:aspect-[16/13]"
+                }`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={heroSrc}
+                  alt={product.nameAr}
+                  className="w-full h-full object-contain p-6 sm:p-8 md:p-10"
+                  fetchPriority="high"
+                />
+              </div>
 
-          {/* Info */}
-          <div className="space-y-5">
-            {/* Stars */}
-            <div className="flex items-center gap-2">
-              <span className="flex gap-0.5">
-                {Array(5).fill(null).map((_, i) => (
-                  <span key={i} className="text-gold text-lg">★</span>
-                ))}
-              </span>
-              <span className="text-navy/50 text-sm font-medium">(248 تقييم)</span>
+              <div className="space-y-5 lg:sticky lg:top-24 xl:top-28">
+                <div
+                  id="pdp-headline-anchor"
+                  className="scroll-mt-[6rem] space-y-4 text-right"
+                >
+                  <div className="flex flex-wrap items-center gap-2 justify-start flex-row-reverse">
+                    {product.badge && (
+                      <span className="inline-flex bg-navy text-gold px-3 py-1 rounded-lg text-xs font-black">
+                        {product.badge}
+                      </span>
+                    )}
+                    <span className="text-navy/45 text-[11px] font-bold uppercase tracking-wide">
+                      {BRAND.nameAr}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 justify-end flex-row-reverse flex-wrap">
+                    <span className="flex gap-0.5" aria-hidden>
+                      {Array(5)
+                        .fill(null)
+                        .map((_, i) => (
+                          <span key={i} className="text-gold text-xl">
+                            ★
+                          </span>
+                        ))}
+                    </span>
+                    <span className="text-navy/55 text-sm font-bold">
+                      {product.rating.toFixed(1)}/٥ ({product.reviewCount.toLocaleString("ar-SA")}{" "}
+                      تقييم مُثبت)
+                    </span>
+                  </div>
+
+                  <h1 className="font-black text-navy text-2xl sm:text-3xl md:text-[2rem] leading-[1.25] lg:leading-tight">
+                    {extras.headlineAr}
+                  </h1>
+
+                  <p className="text-gold font-extrabold text-base md:text-lg leading-snug">
+                    {extras.promiseAr}
+                  </p>
+
+                  <p className="text-navy/55 text-sm font-medium leading-relaxed border-r-4 border-gold/70 pr-3">
+                    <span className="text-navy/75 font-semibold">{product.nameAr}:</span>{" "}
+                    {product.shortBenefit}
+                  </p>
+
+                  <p className="inline-flex items-center gap-2 bg-red-500/10 text-red-700 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl border border-red-500/20">
+                    {stockLabel}
+                  </p>
+
+                  <ul className="space-y-2.5 pt-1">
+                    {product.benefits.map((b) => (
+                      <li
+                        key={b}
+                        className="flex items-start gap-2 justify-end flex-row-reverse text-navy font-semibold text-sm md:text-base leading-snug"
+                      >
+                        <span className="text-emerald-500 font-black mt-0.5">✓</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <OfferSelector product={product} />
+              </div>
             </div>
 
-            <h1 className="font-extrabold text-navy text-3xl leading-tight">
-              {product.nameAr}
-            </h1>
-            <p className="text-navy/60 text-lg">{product.descriptionAr}</p>
+            <PdpTrustRibbon />
 
-            {/* Scarcity */}
-            <p className="inline-block bg-red-50 text-red-600 font-bold text-sm px-3 py-1.5 rounded-lg">
-              🔥 ٧ قطع فقط متبقية
-            </p>
+            <PdpPainBullets bullets={extras.painBulletsAr} />
 
-            {/* Benefits */}
-            <ul className="space-y-2">
-              {product.benefits.map((b) => (
-                <li key={b} className="flex items-center gap-2 text-navy font-medium">
-                  <span className="text-green-500 font-black">✓</span>
-                  {b}
-                </li>
-              ))}
-            </ul>
+            <PdpTestimonialsStrip
+              items={extras.testimonialsAr}
+              productImageSrc={heroSrc}
+              productName={product.nameAr}
+            />
 
-            {/* Offer selector */}
-            <OfferSelector product={product} />
+            <PdpScienceStrip cards={extras.scienceCardsAr} />
+
+            {blocks.length > 0 && (
+              <ProductPdpZigzag
+                title={extras.zigzagLeadAr}
+                ariaLabel={`تفاصيل إضافية ${product.nameAr}`}
+                blocks={blocks}
+              />
+            )}
+
+            <PdpCodPathStrip />
+
+            <PdpProductFaq faqs={extras.faqAr} />
+
+            <PdpFinalConfidence />
           </div>
-        </div>
-
-        {/* How it works */}
-        <section className="mt-16">
-          <h2 className="font-extrabold text-navy text-2xl mb-6 text-center">كيف يعمل؟</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { step: "١", text: "اختاري الكمية المناسبة" },
-              { step: "٢", text: "أكملي طلبك بالاسم والجوال" },
-              { step: "٣", text: "انتظري التوصيل السريع" },
-              { step: "٤", text: "ادفعي عند الاستلام" },
-            ].map((s) => (
-              <div key={s.step} className="text-center space-y-2">
-                <div className="w-12 h-12 rounded-full bg-gold/20 text-gold font-black text-xl flex items-center justify-center mx-auto">
-                  {s.step}
-                </div>
-                <p className="text-navy font-semibold text-sm">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="mt-14 max-w-2xl mx-auto">
-          <h2 className="font-extrabold text-navy text-2xl mb-6 text-center">أسئلة شائعة</h2>
-          <div className="space-y-3">
-            {[
-              { q: "هل التركيب سهل؟", a: "نعم، يتم في أقل من دقيقتين بدون أدوات." },
-              { q: "هل يناسب جميع السيارات؟", a: "يناسب معظم السيارات اليابانية والكورية والأمريكية." },
-              { q: "ما سياسة الإرجاع؟", a: "إرجاع مجاني خلال 7 أيام وفق الشروط المعلنة إذا لم يكن المنتج مناسباً." },
-            ].map((faq) => (
-              <details key={faq.q} className="bg-navy/5 rounded-xl p-4">
-                <summary className="font-bold text-navy cursor-pointer list-none">{faq.q}</summary>
-                <p className="text-navy/70 mt-2 text-sm">{faq.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-        </div>
-      </main>
-
-      {/* Sticky mobile CTA */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-navy/10 p-4 z-30">
-        <OfferSelector product={product} />
-      </div>
-      <div className="md:hidden h-40" /> {/* spacer for sticky bar */}
+        </main>
+      </ProductPdpShell>
 
       <Footer />
     </>
