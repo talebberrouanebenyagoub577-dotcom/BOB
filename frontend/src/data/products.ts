@@ -1,4 +1,5 @@
 import type { Product, PriceTier } from "@/types";
+import { PRODUCT_LIST_IMAGE_SRC } from "@/lib/bundledProductMedia";
 
 export const PRODUCTS: Product[] = [
   {
@@ -10,7 +11,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "منظّم ذكي يحوّل مقعد سيارتك إلى مساحة منظمة بالكامل. جيوب متعددة، تصميم مرن، تركيب في دقيقتين.",
     price: 199,
-    image: "/product-detail/seat-organizer.svg",
+    image: PRODUCT_LIST_IMAGE_SRC["seat-organizer"],
     badge: "الأكثر مبيعاً",
     reviewCount: 284,
     rating: 5,
@@ -30,7 +31,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "يسد الفجوة بين المقعد والكونسول نهائياً. لا مزيد من فقدان المفاتيح أو الجوال أو العملات.",
     price: 199,
-    image: "/product-detail/seatgap-protector.svg",
+    image: PRODUCT_LIST_IMAGE_SRC["seatgap-protector"],
     badge: "مشكلة يومية",
     reviewCount: 197,
     rating: 5,
@@ -50,7 +51,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "عدسة واسعة الزاوية تُريك الزوايا العمياء بوضوح تام. ثبّتها على مرآتك الخارجية وتخلص من قلق الاصطفاف.",
     price: 199,
-    image: "/product-detail/parking-mirror.svg",
+    image: PRODUCT_LIST_IMAGE_SRC["parking-mirror"],
     badge: "ثقة بالقيادة",
     reviewCount: 156,
     rating: 5,

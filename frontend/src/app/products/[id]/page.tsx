@@ -9,7 +9,7 @@ import { PRODUCTS } from "@/data/products";
 
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { BRAND, defaultSiteTitle } from "@/lib/brand";
-import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "@/lib/productDetailMedia";
+import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "@/lib/bundledProductMedia";
 
 /** يمنع الاعتماد على نسخ HTML معادّة توليدها في بناء قديم كانت تُرجع 404 لـ /products/[id] */
 export const dynamic = "force-dynamic";

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-label="Cabin bundle">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0B1628"/>
+      <stop offset="50%" stop-color="#152A45"/>
+      <stop offset="100%" stop-color="#0B1628"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="360" fill="url(#g)"/>
+  <rect x="48" y="300" width="864" height="4" fill="#C9A24D" opacity="0.9"/>
+  <text x="480" y="170" fill="#F6F4EF" font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="28" font-weight="800" text-anchor="middle">Complete cabin lineup</text>
+  <text x="480" y="220" fill="#D4B465" font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="17" text-anchor="middle">Organize - protect the gap - park with confidence</text>
+</svg>
