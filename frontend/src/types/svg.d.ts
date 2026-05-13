@@ -1,5 +1,5 @@
 declare module "*.svg" {
-  /** يُحمَّل مسار CDN/hashed ضمن `_next/static` عبر المُحمِّل حتى لا تعتمد على `/public`. */
-  const src: string;
-  export default src;
+  import type { StaticImageData } from "next/image";
+  const content: StaticImageData;
+  export default content;
 }
