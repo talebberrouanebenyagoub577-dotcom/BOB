@@ -9,7 +9,7 @@ import { PRODUCTS } from "@/data/products";
 
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { BRAND, defaultSiteTitle } from "@/lib/brand";
-import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "@/lib/bundledProductMedia";
+import { getProductPageHeroUrl } from "@/lib/bundledProductMedia";
 import { catalogMainSurfaceStyle } from "@/lib/catalogSurfaceStyle";
 
 /** يمنع الاعتماد على نسخ HTML معادّة توليدها في بناء قديم كانت تُرجع 404 لـ /products/[id] */
@@ -54,7 +54,7 @@ export default async function ProductPage({ params }: Props) {
       <main className="w-full pb-14" style={catalogMainSurfaceStyle}>
         <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* معرض صفحة المنتج — ملفات في /public/product-detail */}
+          {/* معرض صفحة المنتج — صورة المنتج الحالي فقط */}
           <div className="aspect-[4/3] bg-navy/5 rounded-2xl overflow-hidden flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -100,36 +100,6 @@ export default async function ProductPage({ params }: Props) {
             <OfferSelector product={product} />
           </div>
         </div>
-
-        <section
-          className="mt-10 rounded-2xl overflow-hidden bg-navy/5"
-          aria-label="مجموعة نيدها أوتو — تنظيم، حماية الفراغ، ورؤية أوضح"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={PRODUCT_PAGE_SHARED_SRC}
-            alt="حامي فراغ المقعد، منظّم ظهر المقعد، ومرايا الركن — مجموعة مقصورة نيدها أوتو"
-            className="w-full h-auto block"
-            loading="lazy"
-          />
-        </section>
-
-        <section
-          className="mt-10 grid gap-6 md:grid-cols-2"
-          aria-label="صور توضيحية للمنتجات"
-        >
-          {PRODUCT_PAGE_HIGHLIGHT_IMAGES.map((item) => (
-            <div key={item.src} className="rounded-2xl overflow-hidden bg-navy/5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.src}
-                alt={item.alt}
-                className="w-full h-auto block"
-                loading="lazy"
-              />
-            </div>
-          ))}
-        </section>
 
         {/* How it works */}
         <section className="mt-16">

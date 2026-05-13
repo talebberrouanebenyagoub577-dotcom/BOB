@@ -1,7 +1,7 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { PRODUCTS, CROSS_SELL_MAP } from "../data/products";
-import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "../data/productDetailMedia";
+import { getProductPageHeroUrl } from "../data/productDetailMedia";
 import { useCart } from "../store/cartStore";
 
 const PRICING = [
@@ -212,27 +212,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <section
-            className="product-pdp-shared-visual"
-            aria-label="مجموعة نيدها أوتو — تنظيم، حماية الفراغ، ورؤية أوضح"
-          >
-            <img
-              src={PRODUCT_PAGE_SHARED_SRC}
-              alt="حامي فراغ المقعد، منظّم ظهر المقعد، ومرايا الركن — مجموعة مقصورة نيدها أوتو"
-              loading="lazy"
-            />
-          </section>
-
-          <section
-            className="product-pdp-highlight-grid"
-            aria-label="صور توضيحية للمنتجات"
-          >
-            {PRODUCT_PAGE_HIGHLIGHT_IMAGES.map((item) => (
-              <div key={item.src} className="product-pdp-highlight-cell">
-                <img src={item.src} alt={item.alt} loading="lazy" />
-              </div>
-            ))}
-          </section>
         </div>
       </section>
 
