@@ -19,6 +19,7 @@ services:
 
   backend:
     build: ./backend
+    image: ghcr.io/talebberrouanebenyagoub577-dotcom/bob-backend:latest
     container_name: nidhamauto_backend
     restart: unless-stopped
     env_file: ./backend/.env
@@ -55,6 +56,7 @@ services:
   # وإلا يبقى compose على 3000:3000 مع PORT: "3000" (الافتراضي في Dockerfile).
   frontend:
     build: ./frontend
+    image: ghcr.io/talebberrouanebenyagoub577-dotcom/bob-frontend:latest
     container_name: nidhamauto_frontend
     restart: unless-stopped
     env_file: ./frontend/.env
