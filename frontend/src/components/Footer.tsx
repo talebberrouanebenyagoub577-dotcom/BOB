@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
+import { BRAND, contactPhoneHref } from "@/lib/brand";
 
 export function Footer() {
   return (
@@ -10,6 +10,16 @@ export function Footer() {
           <p className="font-extrabold text-white text-base mb-2">{BRAND.nameAr}</p>
           <p className="leading-relaxed">
             {BRAND.footerBlurbAr}
+          </p>
+          <p className="mt-4 pt-4 border-t border-white/15">
+            <span className="block text-[11px] font-bold text-white/40 mb-1">التواصل الهاتفي</span>
+            <a
+              href={contactPhoneHref()}
+              dir="ltr"
+              className="text-gold font-black text-lg tabular-nums hover:underline tracking-tight"
+            >
+              {BRAND.contactPhoneIntl}
+            </a>
           </p>
         </div>
 

@@ -20,7 +20,6 @@ export function CartDrawer() {
   const crossSell = PRODUCTS.filter((p) => !cartSkus.has(p.sku)).slice(0, 2);
 
   const handleCheckout = () => {
-    closeDrawer();
     trackInitiateCheckout(total());
     trackServerEvent("initiate_checkout", { value: total() });
     openCheckout();
@@ -64,13 +63,18 @@ export function CartDrawer() {
             </p>
           ) : (
             items.map((item) => (
-              <div
-                key={item.product.sku}
-                className="flex items-center gap-3 bg-navy/5 rounded-xl p-3"
-              >
-                <div className="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center text-2xl flex-shrink-0">
-                  🛍️
-                </div>
+                <div
+                  key={item.product.sku}
+                  className="flex items-center gap-3 bg-navy/5 rounded-xl p-3"
+                >
+                  <div className="w-16 h-16 sm:w-[4.25rem] sm:h-[4.25rem] rounded-xl bg-white border border-navy/10 flex-shrink-0 overflow-hidden flex items-center justify-center p-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.product.image}
+                      alt=""
+                      className="max-w-full max-h-full w-auto h-auto object-contain object-center"
+                    />
+                  </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-navy text-sm leading-snug truncate">
                     {item.product.nameAr}

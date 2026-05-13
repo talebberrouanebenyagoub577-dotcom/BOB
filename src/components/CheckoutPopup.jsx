@@ -1,12 +1,27 @@
 import { useMemo, useState } from "react";
 import { useCart } from "../store/cartStore";
 
-const SAUDI_PHONE_REGEX = /^05\d{8}$/;
+const SAUDI_OK = /^05\d{8}$/;
+
+function normalizeSaudiPhone(raw) {
+  let d = String(raw).replace(/\D/g, "");
+  if (d.startsWith("00")) d = d.slice(2);
+  if (/^9665\d{8}$/.test(d)) return `0${d.slice(3)}`;
+  if (/^05\d{8}$/.test(d)) return d;
+  if (/^5\d{8}$/.test(d) && d.length === 9) return `0${d}`;
+  return d;
+}
+
+function isValidSaudiPhone(raw) {
+  return SAUDI_OK.test(normalizeSaudiPhone(raw));
+}
 
 function validate(values) {
   const errors = {};
   if (!values.name.trim() || values.name.trim().length < 2) errors.name = "الاسم مطلوب (حرفان على الأقل)";
-  if (!SAUDI_PHONE_REGEX.test(values.phone)) errors.phone = "أدخل رقم جوال سعودي صحيح — مثال: 05XXXXXXXX";
+  if (!isValidSaudiPhone(values.phone))
+    errors.phone =
+      "رقم الجوال لازم يكون سعودي (مثال: 0550603022 أو نفس الرقم بصيغة +966… أو 00966…)";
   return errors;
 }
 
@@ -51,7 +66,7 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
     try {
       await onOrderConfirmed({
         customerName: values.name.trim(),
-        phone: values.phone.trim(),
+        phone: normalizeSaudiPhone(values.phone),
         items: cartItems,
         total: checkoutTotal,
       });
@@ -125,13 +140,16 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
                   value={values.phone}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="05XXXXXXXX"
+                  placeholder="+966550603022 أو 0550603022"
+                  maxLength={22}
                   autoComplete="tel"
                 />
                 {showErr("phone") && errors.phone ? (
                   <p style={{ fontSize: 12, color: "var(--red)", marginTop: 4, fontWeight: 600 }}>{errors.phone}</p>
                 ) : (
-                  <p style={{ fontSize: 11, color: "var(--gray-400)", marginTop: 4 }}>مثال: 0512345678</p>
+                  <p style={{ fontSize: 11, color: "var(--gray-400)", marginTop: 4 }}>
+                    نقبل 05XXXXXXXX أو +9665XXXXXXXX أو 009665XXXXXXXX — نحدّث التنسيق تلقائياً
+                  </p>
                 )}
               </div>
 

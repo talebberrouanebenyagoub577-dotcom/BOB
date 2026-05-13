@@ -5,17 +5,7 @@ import { useCartStore } from "@/lib/store";
 import { generateEventId } from "@/lib/eventId";
 import { getTrackingSessionId } from "@/lib/serverTrack";
 import clsx from "clsx";
-
-function normalizeSaudiPhone(value: string): string {
-  const digits = value.trim().replace(/[^\d+]/g, "");
-  if (/^\+9665\d{8}$/.test(digits)) return `0${digits.slice(4)}`;
-  if (/^9665\d{8}$/.test(digits)) return `0${digits.slice(3)}`;
-  return digits;
-}
-
-function isValidSaudiPhone(value: string): boolean {
-  return /^05\d{8}$/.test(normalizeSaudiPhone(value));
-}
+import { isValidSaudiPhone, normalizeSaudiPhone } from "@/lib/saudiPhone";
 
 export function CheckoutPopup() {
   const { items, isCheckoutOpen, closeCheckout, openUpsell, upsellShownThisSession, total, clearCart } =
@@ -168,8 +158,8 @@ export function CheckoutPopup() {
                 dir="ltr"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="05XXXXXXXX أو +9665XXXXXXXX"
-                maxLength={13}
+                placeholder="+966550603022 أو 0550603022"
+                maxLength={22}
                 className={clsx(
                   "w-full border-2 rounded-xl px-4 py-3 font-mono tracking-wider text-navy outline-none transition-colors",
                   phoneValid || phone === ""
@@ -177,10 +167,12 @@ export function CheckoutPopup() {
                     : "border-red-400 focus:border-red-400"
                 )}
               />
-              <p className="text-navy/40 text-xs mt-1">مثال: 0512345678 أو +966512345678</p>
+              <p className="text-navy/40 text-xs mt-1">
+                نقبل الصيغ الشائعة مثل 05XXXXXXXX أو +9665XXXXXXXX أو 009665XXXXXXXX — نحوّلها تلقائياً عند التأكيد
+              </p>
               {!phoneValid && phone.length > 0 && (
                 <p className="text-red-500 text-xs mt-0.5 font-medium">
-                  يرجى إدخال رقم سعودي صحيح مثل 05XXXXXXXX أو +9665XXXXXXXX
+                  رقم الجوال لازم يكون سعودي بصيغة تعادل «05XXXXXXXX» (أو نفس المعنى بتنسيق دولي)
                 </p>
               )}
             </div>

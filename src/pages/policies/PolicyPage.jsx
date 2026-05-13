@@ -116,6 +116,18 @@ export default function PolicyPage() {
               </div>
             ))}
           </div>
+
+          {(slug === "privacy" || slug === "terms") && (
+            <div className="contact-phone-sheet mt-8">
+              <p className="contact-phone-sheet__title">الرقم الموحَّد للتواصل</p>
+              <p className="contact-phone-sheet__sub">
+                الرقم الرسمي الوحيد في {BRAND.nameAr}.
+              </p>
+              <a href={`tel:${BRAND.contactPhoneIntl}`} className="contact-phone-sheet__link" dir="ltr">
+                {BRAND.contactPhoneIntl}
+              </a>
+            </div>
+          )}
         </div>
       </section>
     </>

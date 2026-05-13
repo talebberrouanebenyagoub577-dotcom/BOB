@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Product } from "@/types";
 import { PRICE_TIERS, getTierPrice } from "@/data/products";
 import { useCartStore } from "@/lib/store";
-import { trackAddToCart } from "@/lib/pixels";
+import { trackAddToCart, trackInitiateCheckout } from "@/lib/pixels";
 import { trackServerEvent } from "@/lib/serverTrack";
 import { useOptionalPdpQty } from "@/components/pdp/PdpQtyContext";
 import clsx from "clsx";
@@ -19,7 +19,7 @@ export function OfferSelector({ product }: Props) {
   const selectedQty = optional ? optional.qty : inner[0];
   const setSelectedQty = optional ? optional.setQty : inner[1];
 
-  const { addItem, openDrawer } = useCartStore();
+  const { addItem, openCheckout } = useCartStore();
   const price = getTierPrice(selectedQty);
 
   const handleBuy = () => {
@@ -31,7 +31,10 @@ export function OfferSelector({ product }: Props) {
       qty: selectedQty,
       revenue: price,
     });
-    openDrawer();
+    const cartTotal = useCartStore.getState().total();
+    trackInitiateCheckout(cartTotal);
+    trackServerEvent("initiate_checkout", { value: cartTotal });
+    openCheckout();
   };
 
   return (

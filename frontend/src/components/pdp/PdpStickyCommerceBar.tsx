@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { getTierPrice } from "@/data/products";
 import { useCartStore } from "@/lib/store";
-import { trackAddToCart } from "@/lib/pixels";
+import { trackAddToCart, trackInitiateCheckout } from "@/lib/pixels";
 import { trackServerEvent } from "@/lib/serverTrack";
 import { usePdpQty } from "@/components/pdp/PdpQtyContext";
 
@@ -23,7 +23,7 @@ interface StickyBarProps {
 
 export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
   const { product, qty, setQty } = usePdpQty();
-  const { addItem, openDrawer } = useCartStore();
+  const { addItem, openCheckout } = useCartStore();
   const barRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -40,8 +40,11 @@ export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
       qty,
       revenue: price,
     });
-    openDrawer();
-  }, [addItem, openDrawer, product, qty]);
+    const cartTotal = useCartStore.getState().total();
+    trackInitiateCheckout(cartTotal);
+    trackServerEvent("initiate_checkout", { value: cartTotal });
+    openCheckout();
+  }, [addItem, openCheckout, product, qty]);
 
   const price = getTierPrice(qty);
 

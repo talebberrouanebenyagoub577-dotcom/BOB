@@ -18,13 +18,11 @@ export default function Header() {
       <div className="header-inner">
         {/* Logo — right side (RTL) */}
         <Link to="/" className="logo">
-          <div className="logo-circle">
-            <span className="logo-letter">N</span>
-          </div>
-          <div className="logo-text">
-            <span className="logo-ar">{BRAND.nameAr}</span>
-            <span className="logo-en">{BRAND.nameEn}</span>
-          </div>
+          <img
+            src="/brand/nidhamauto-logo.png"
+            alt={`${BRAND.nameAr} — ${BRAND.nameEn}`}
+            className="logo-img"
+          />
         </Link>
 
         {/* Nav — center */}

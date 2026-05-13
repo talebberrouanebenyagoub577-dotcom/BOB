@@ -57,7 +57,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   openDrawer: () => set({ isDrawerOpen: true }),
   closeDrawer: () => set({ isDrawerOpen: false }),
-  openCheckout: () => set({ isCheckoutOpen: true }),
+  openCheckout: () => set({ isCheckoutOpen: true, isDrawerOpen: false }),
   closeCheckout: () => set({ isCheckoutOpen: false }),
   openUpsell: () =>
     set({ isUpsellOpen: true, upsellShownThisSession: true }),

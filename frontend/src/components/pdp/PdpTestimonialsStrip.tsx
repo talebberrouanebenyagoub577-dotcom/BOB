@@ -34,16 +34,16 @@ export function PdpTestimonialsStrip({
             >
               <div className="grid md:grid-cols-2 gap-0 md:gap-10 md:items-stretch">
                 <div
-                  className={`relative w-full h-[260px] sm:h-[280px] md:h-[340px] bg-gradient-to-br from-navy/[0.07] via-white to-gold/[0.12] flex items-center justify-center p-6 md:p-10 ${
+                  className={`relative w-full min-h-[min(88vw,400px)] h-[320px] sm:h-[340px] md:h-[360px] bg-gradient-to-br from-navy/[0.07] via-white to-gold/[0.12] flex items-center justify-center p-2 sm:p-5 md:p-10 ${
                     imageFirst ? "md:order-1" : "md:order-2"
                   }`}
                 >
-                  <div className="relative w-full h-full max-w-[440px] mx-auto">
+                  <div className="relative w-full h-full max-w-[min(100%,480px)] mx-auto min-h-[280px] sm:min-h-0">
                     <Image
                       src={productImageSrc}
                       alt={productName}
                       fill
-                      className="object-contain drop-shadow-lg"
+                      className="object-contain object-center drop-shadow-lg p-1 sm:p-3"
                       sizes="(max-width:768px) 100vw, 50vw"
                     />
                   </div>

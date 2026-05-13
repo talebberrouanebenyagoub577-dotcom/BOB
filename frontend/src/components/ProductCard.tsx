@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Product } from "@/types";
 import { PRICE_TIERS } from "@/data/products";
 import { useCartStore } from "@/lib/store";
-import { trackAddToCart } from "@/lib/pixels";
+import { trackAddToCart, trackInitiateCheckout } from "@/lib/pixels";
 import { trackServerEvent } from "@/lib/serverTrack";
 
 interface Props {
@@ -22,25 +22,31 @@ function Stars({ count = 5 }: { count?: number }) {
 }
 
 export function ProductCard({ product }: Props) {
-  const { addItem, openDrawer } = useCartStore();
+  const { addItem, openCheckout } = useCartStore();
 
   const handleBuy = () => {
     addItem(product, 1);
     trackAddToCart(product.id, product.price);
     trackServerEvent("add_to_cart", { sku: product.sku, productId: product.id });
-    openDrawer();
+    const cartTotal = useCartStore.getState().total();
+    trackInitiateCheckout(cartTotal);
+    trackServerEvent("initiate_checkout", { value: cartTotal });
+    openCheckout();
   };
 
   return (
     <article className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
       {/* Image */}
       <div className="relative">
-        <Link href={`/products/${product.id}`} className="block aspect-square bg-navy/10 relative overflow-hidden">
+        <Link
+          href={`/products/${product.id}`}
+          className="block aspect-[5/6] max-sm:min-h-[220px] sm:aspect-square bg-navy/[0.07] relative overflow-hidden flex items-center justify-center"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.image}
             alt={product.nameAr}
-            className="w-full h-full object-cover"
+            className="w-full h-full max-h-full object-contain object-center p-2 sm:p-2.5"
             loading="lazy"
           />
         </Link>

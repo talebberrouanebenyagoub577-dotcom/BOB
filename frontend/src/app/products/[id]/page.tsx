@@ -96,17 +96,17 @@ export default async function ProductPage({ params }: Props) {
           <div className="max-w-6xl mx-auto px-4 py-8 md:py-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-start">
               <div
-                className={`rounded-3xl bg-gradient-to-br from-navy/[0.04] via-white to-gold/[0.06] border border-navy/10 shadow-sm overflow-hidden ${
+                className={`rounded-3xl bg-gradient-to-br from-navy/[0.04] via-white to-gold/[0.06] border border-navy/10 shadow-sm overflow-hidden w-full flex items-center justify-center ${
                   isWidePdpHero
-                    ? "aspect-[15/10] xl:max-h-[540px]"
-                    : "aspect-[4/3] lg:aspect-[16/13]"
+                    ? "aspect-[15/14] max-sm:min-h-[min(320px,88vw)] sm:aspect-[15/11] md:aspect-[15/10] xl:max-h-[540px]"
+                    : "aspect-[4/5] max-sm:min-h-[min(300px,85vw)] sm:aspect-[4/3] lg:aspect-[16/13]"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={heroSrc}
                   alt={product.nameAr}
-                  className="w-full h-full object-contain p-6 sm:p-8 md:p-10"
+                  className="w-full h-full max-h-full object-contain object-center p-2 sm:p-4 md:p-8 lg:p-10"
                   fetchPriority="high"
                 />
               </div>

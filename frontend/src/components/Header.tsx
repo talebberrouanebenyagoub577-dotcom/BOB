@@ -1,8 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCartStore } from "@/lib/store";
 import { BRAND } from "@/lib/brand";
+
+const LOGO_PATH = "/brand/nidhamauto-logo.png";
+
+/** شعار دائري — نفس الحجم المرئي للجوال والكمبيوتر ضمن الهيدر */
+const LOGO_BOX =
+  "h-11 w-11 sm:h-[2.75rem] sm:w-[2.75rem] md:h-12 md:w-12 lg:h-[3.25rem] lg:w-[3.25rem]";
 
 export function Header() {
   const { items, openDrawer } = useCartStore();
@@ -10,25 +17,24 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 bg-navy text-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo — RTL start = right side */}
-        <Link href="/" className="flex items-center gap-3 group" aria-label={`${BRAND.nameAr} — الرئيسية`}>
-          <span className="w-10 h-10 rounded-full bg-gold flex items-center justify-center font-black text-navy text-xl select-none group-hover:ring-2 group-hover:ring-gold-light/50 transition-shadow">
-            N
-          </span>
-          <span className="font-extrabold text-lg leading-tight text-right">
-            <span className="block text-white">{BRAND.nameAr}</span>
-            <span className="block text-gold/90 text-[11px] font-semibold tracking-wide">
-              {BRAND.nameEn}
-            </span>
-            <span className="hidden sm:block text-white/45 text-[10px] font-medium normal-case tracking-normal mt-0.5 max-w-[11rem]">
-              {BRAND.taglineAr}
-            </span>
-          </span>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-3">
+        <Link
+          href="/"
+          className={`flex shrink-0 items-center justify-center rounded-full overflow-hidden bg-navy ring-2 ring-gold/40 shadow-lg ${LOGO_BOX} py-0 group`}
+          aria-label={`${BRAND.nameAr} — ${BRAND.nameEn} — الرئيسية`}
+        >
+          <Image
+            src={LOGO_PATH}
+            alt={`${BRAND.nameAr} — ${BRAND.nameEn}`}
+            width={256}
+            height={256}
+            className="h-full w-full object-contain object-center transition-opacity group-hover:opacity-92"
+            priority
+            sizes="(max-width: 768px) 44px, 52px"
+          />
         </Link>
 
-        {/* Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-semibold">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-6 text-sm font-semibold">
           <Link href="/shop" className="hover:text-gold transition-colors">
             المنتجات
           </Link>
@@ -40,11 +46,11 @@ export function Header() {
           </Link>
         </nav>
 
-        {/* Cart button — LTR end = left side in RTL */}
         <button
+          type="button"
           onClick={openDrawer}
           aria-label="السلة"
-          className="relative flex items-center gap-2 bg-gold/20 hover:bg-gold/30 transition-colors rounded-xl px-3 py-2"
+          className="relative flex items-center gap-2 bg-gold/20 hover:bg-gold/30 transition-colors rounded-xl px-2.5 sm:px-3 py-2 shrink-0"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

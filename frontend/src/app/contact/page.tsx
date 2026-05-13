@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ContactPhoneSheet } from "@/components/ContactPhoneSheet";
 import { BRAND } from "@/lib/brand";
 
 export default function ContactPage() {
@@ -20,10 +21,12 @@ export default function ContactPage() {
         <h1 className="font-extrabold text-navy text-4xl text-center mb-4">
           تواصل معنا
         </h1>
-        <p className="text-center text-navy/60 text-sm max-w-md mx-auto mb-8 leading-relaxed">
+        <p className="text-center text-navy/60 text-sm max-w-md mx-auto mb-6 leading-relaxed">
           فريق {BRAND.nameAr} يقرأ رسائلك باهتمام. اذكر رقم الطلب إن كان استفسارك يتعلق بشحنة أو
           منتج.
         </p>
+
+        <ContactPhoneSheet className="mb-10" />
 
         {sent ? (
           <div className="text-center space-y-4 py-12">

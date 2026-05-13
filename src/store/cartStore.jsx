@@ -31,7 +31,8 @@ function cartReducer(state, action) {
       const currentQty = state.items[action.productId] ?? 0;
       return {
         ...state,
-        isDrawerOpen: true,
+        isDrawerOpen: false,
+        isCheckoutOpen: true,
         items: {
           ...state.items,
           [action.productId]: currentQty + (action.quantity ?? 1),

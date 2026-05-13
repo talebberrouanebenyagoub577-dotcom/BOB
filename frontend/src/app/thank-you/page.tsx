@@ -1,50 +1,76 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+
 import Link from "next/link";
+
 import Image from "next/image";
+
 import { Header } from "@/components/Header";
+
 import { Footer } from "@/components/Footer";
+
 import { CartDrawer } from "@/components/CartDrawer";
+
 import { CheckoutPopup } from "@/components/CheckoutPopup";
+
 import { UpsellModal } from "@/components/UpsellModal";
+
 import { PRODUCTS, UPSELL_PRICE } from "@/data/products";
+
 import type { Product } from "@/types";
+
 import { trackPurchase } from "@/lib/pixels";
 
 const CALL_START_HOUR = 9;
-const CALL_END_HOUR = 21; // exclusive — last calls before 21:00
+
+const CALL_END_HOUR = 21;
+
 const COUNTDOWN_SECONDS = 10 * 60;
 
 interface OrderLine {
   sku: string;
+
   qty: number;
+
   unit_price: number;
+
   name_ar: string;
 }
 
 interface OrderData {
   items: OrderLine[];
+
   total: number;
+
   event_id: string;
+
   order_number?: string;
+
   upsell_accepted?: boolean;
+
   upsell_sku?: string;
+
   upsell_name_ar?: string;
 }
 
 function hourInTimeZone(date: Date, timeZone: string): number {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone,
+
     hour: "numeric",
+
     hour12: false,
   }).formatToParts(date);
+
   const h = parts.find((p) => p.type === "hour")?.value;
+
   return h != null ? parseInt(h, 10) : 12;
 }
 
 function isWithinCallWindow(date: Date): boolean {
   const h = hourInTimeZone(date, "Asia/Riyadh");
+
   return h >= CALL_START_HOUR && h < CALL_END_HOUR;
 }
 
@@ -52,316 +78,557 @@ function formatMoney(n: number): string {
   return `${n.toLocaleString("ar-SA")} ر.س`;
 }
 
+function AnimatedThankYouCheck() {
+  return (
+    <div className="flex justify-center" aria-hidden>
+      <div className="animate-thank-you-check-pop">
+        <div className="flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full bg-emerald-500 shadow-[0_14px_48px_-10px_rgba(16,185,129,0.75)] ring-[3px] ring-emerald-300/55 ring-offset-[6px] ring-offset-[#070707] xs:h-[5.25rem] xs:w-[5.25rem] xs:ring-offset-8">
+          <svg
+            viewBox="0 0 24 24"
+            className="h-12 w-12 text-white xs:h-[3.35rem] xs:w-[3.35rem]"
+            aria-hidden
+          >
+            <path
+              d="M7 13l3 3 7-9"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="animate-thank-you-check-draw"
+              style={{ strokeDasharray: 22, strokeDashoffset: 22 }}
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrderStatusRoadmap() {
+  const steps = [
+    { id: "placed", title: "تم الطلب", state: "done" as const },
+
+    { id: "confirm", title: "قيد التأكيد", state: "current" as const },
+
+    { id: "ship", title: "جاري التوصيل", state: "pending" as const },
+  ];
+
+  return (
+    <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.07] to-white/[0.02] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm xs:p-5 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-4">
+        <h2 className="text-base font-black text-white sm:text-lg">
+          مسار الطلب
+        </h2>
+
+        <span className="rounded-full border border-gold/35 bg-black/40 px-2.5 py-1 text-[10px] font-bold text-gold/95 xs:text-[11px]">
+          خطوات واضحة حتى يصلك الطلب
+        </span>
+      </div>
+
+      {/* Mobile-first: عمودي صغير، ثم صف أفقي من sm */}
+
+      <div className="relative sm:hidden">
+        <div className="mr-[15px] flex flex-col gap-0 border-r-2 border-dashed border-white/15 pr-6">
+          {steps.map((s, i) => (
+            <div key={s.id} className="relative pb-8 last:pb-0">
+              <span
+                className={`absolute right-[-26px] top-1 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-2 text-[11px] font-black ${
+                  s.state === "done"
+                    ? "border-emerald-400 bg-emerald-500 text-white shadow-[0_0_24px_-4px_rgba(16,185,129,0.8)]"
+                    : s.state === "current"
+                      ? "animate-thank-you-pulse-soft border-gold bg-black text-gold"
+                      : "border-white/20 bg-[#141414] text-white/35"
+                }`}
+              >
+                {s.state === "done" ? "✓" : i + 1}
+              </span>
+
+              <p
+                className={`text-sm font-black leading-snug ${
+                  s.state === "pending"
+                    ? "text-white/35"
+                    : s.state === "current"
+                      ? "text-gold"
+                      : "text-white"
+                }`}
+              >
+                {s.title}
+              </p>
+
+              {s.state === "current" && (
+                <p className="mt-1 text-[11px] font-semibold leading-relaxed text-white/55">
+                  فريق التأكيد يتواصل معك لتأكيد العنوان — الدفع عند الاستلام
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden gap-2 sm:flex sm:flex-row sm:items-start sm:justify-between">
+        {steps.map((s, i) => (
+          <div
+            key={s.id}
+            className={`relative flex min-w-0 flex-1 flex-col items-center text-center ${
+              i < steps.length - 1
+                ? "after:pointer-events-none after:absolute after:inset-x-[-6%] after:top-[19px] after:z-0 after:h-[3px] after:rounded-full after:bg-gradient-to-l after:from-gold/55 after:via-white/12 after:to-transparent"
+                : ""
+            }`}
+          >
+            <span
+              className={`relative z-[1] flex h-11 w-11 items-center justify-center rounded-full border-2 text-sm font-black ${
+                s.state === "done"
+                  ? "border-emerald-400 bg-emerald-500 text-white shadow-[0_0_28px_-6px_rgba(34,197,94,0.85)]"
+                  : s.state === "current"
+                    ? "animate-thank-you-pulse-soft border-gold bg-black text-gold"
+                    : "border-white/20 bg-[#141414] text-white/30"
+              }`}
+            >
+              {s.state === "done" ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
+                  <path
+                    d="M6 13l4 4 9-11"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                i + 1
+              )}
+            </span>
+
+            <p
+              className={`mt-3 text-xs font-black sm:text-[13px] ${
+                s.state === "pending"
+                  ? "text-white/35"
+                  : s.state === "current"
+                    ? "text-gold"
+                    : "text-white"
+              }`}
+            >
+              {s.title}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-5 hidden rounded-xl border border-white/10 bg-black/35 px-3 py-2.5 text-center text-[11px] font-semibold leading-relaxed text-white/55 sm:block">
+        المرحلة الحالية: <span className="text-gold">قيد التأكيد</span> — نتصل
+        بك لتأكيد الهوية والعنوان قبل الشحن
+      </p>
+    </section>
+  );
+}
+
 export default function ThankYouPage() {
   const [order, setOrder] = useState<OrderData | null>(null);
+
   const [timeLeft, setTimeLeft] = useState(COUNTDOWN_SECONDS);
+
   const [landedAt] = useState(() => new Date());
 
   useEffect(() => {
     const raw = sessionStorage.getItem("last_order");
+
     if (raw) {
       const data: OrderData = JSON.parse(raw);
+
       setOrder(data);
-      trackPurchase(data.event_id, data.total, data.items.map((i) => i.sku));
+
+      trackPurchase(
+        data.event_id,
+        data.total,
+        data.items.map((i) => i.sku),
+      );
     }
   }, []);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
+
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
+
     return () => clearTimeout(t);
   }, [timeLeft]);
 
   const inCallWindow = isWithinCallWindow(landedAt);
+
   const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+
   const seconds = String(timeLeft % 60).padStart(2, "0");
 
   const lineRows = useMemo(() => {
     if (!order) return [];
+
     const rows: {
       key: string;
+
       title: string;
+
       subtitle: string;
+
       lineTotal: number;
+
       tag?: string;
     }[] = order.items.map((item) => ({
       key: item.sku,
+
       title: item.name_ar,
+
       subtitle: `${item.qty} × ${formatMoney(item.unit_price)}`,
+
       lineTotal: item.unit_price * item.qty,
     }));
+
     if (order.upsell_accepted && order.upsell_sku && order.upsell_name_ar) {
       rows.push({
         key: `upsell-${order.upsell_sku}`,
+
         title: order.upsell_name_ar,
+
         subtitle: "عرض مضاف مع طلبك",
+
         lineTotal: UPSELL_PRICE,
+
         tag: "عرض خاص",
       });
     }
+
     return rows;
+  }, [order]);
+
+  const productsSummary = useMemo(() => {
+    if (!order || order.items.length === 0) return "—";
+
+    const parts = order.items.map((i) =>
+      i.qty > 1 ? `${i.name_ar} ×${i.qty}` : i.name_ar,
+    );
+
+    if (order.upsell_accepted && order.upsell_name_ar) {
+      parts.push(order.upsell_name_ar);
+    }
+
+    return parts.join("، ");
   }, [order]);
 
   const suggestionProducts = useMemo((): Product[] => {
     if (!order) return PRODUCTS;
+
     const bought = new Set(order.items.map((i) => i.sku));
+
     if (order.upsell_accepted && order.upsell_sku) bought.add(order.upsell_sku);
+
     return PRODUCTS.filter((p) => !bought.has(p.sku));
   }, [order]);
 
   return (
     <>
       <Header />
+
       <CartDrawer />
+
       <CheckoutPopup />
+
       <UpsellModal />
 
-      <main className="min-h-screen bg-gradient-to-b from-navy/[0.04] via-cream to-cream pb-16">
-        {/* High-confirmation banner */}
-        <div className="bg-amber-500 text-navy px-4 py-3 shadow-md border-b border-amber-600/30">
-          <div className="max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 text-center sm:text-right">
-            <span className="inline-flex items-center justify-center gap-2 font-black text-sm sm:text-base shrink-0">
-              <span className="text-xl" aria-hidden>
+      <main className="min-h-screen bg-[#070707] pb-16 pt-0 text-white">
+        <div className="border-b border-gold/25 bg-gradient-to-l from-black via-[#15100a] to-black">
+          <div className="mx-auto flex max-w-2xl flex-col gap-1.5 px-4 py-3 text-center sm:flex-row-reverse sm:items-center sm:justify-center sm:text-right">
+            <span className="inline-flex shrink-0 items-center justify-center gap-2 text-xs font-black text-gold sm:text-sm">
+              <span aria-hidden className="text-lg leading-none">
                 📵➜📞
               </span>
-              مكالمة قد لا يظهر اسمنا عليها — الرجاء الرد
+              المكالمة قد لا تظهر الاسم التجاري — الرجاء الرد
             </span>
-            <span className="hidden sm:inline text-navy/50">|</span>
-            <span className="font-bold text-sm sm:text-base leading-snug">
-              نتصل لتأكيد عنوان الشحن وهويتك قبل الإرسال — الدفع عند الاستلام
+
+            <span
+              className="hidden h-4 w-px bg-gold/30 sm:inline"
+              aria-hidden
+            />
+
+            <span className="text-[11px] font-semibold leading-relaxed text-white/75 xs:text-xs">
+              تأكيد هاتفي للعنوان والهوية قبل الشحن • الدفع عند الاستلام
             </span>
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 pt-10 space-y-8">
-          {/* Hero */}
-          <section className="text-center space-y-3">
-            <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-5xl ring-4 ring-emerald-200/80">
-              ✅
+        <div className="mx-auto max-w-2xl space-y-6 px-4 pt-8 xs:space-y-7 xs:pt-10">
+          {/* Hero — رسالة الأساس مع أيقونة صح متحركة */}
+
+          <header className="text-center">
+            <AnimatedThankYouCheck />
+
+            <div className="mt-8 space-y-3">
+              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold/80">
+                شكرًا لاختيارك لنا
+              </p>
+
+              <h1 className="text-balance px-1 text-[1.625rem] font-black leading-snug xs:text-[1.85rem] sm:text-4xl">
+                تم استلام طلبك بنجاح
+              </h1>
+
+              <p className="mx-auto max-w-md text-[15px] font-medium leading-relaxed text-white/65">
+                نشكر ثقتك الغالية بنا؛ طلبك مسجّل لدينا وجاري تجهيزه وفق أفضل
+                المعايير. فريق الدعم سيُكمل معك تأكيد التفاصيل قبل الشحن.
+              </p>
             </div>
-            <h1 className="font-black text-navy text-3xl md:text-4xl leading-tight">
-              تم استلام طلبك — خطوة رائعة
-            </h1>
-            <p className="text-navy/65 text-base max-w-lg mx-auto leading-relaxed font-medium">
-              فريق التأكيد سيتصل بك على الرقم الذي أدخلته عند الطلب لتأكيد التفاصيل
-              ومناقشة عنوان التسليم قبل الشحن — لا نشارك بياناتك علناً ولن يظهر اسمك أو
-              رقمك على هذه الشاشة.
-            </p>
-          </section>
+          </header>
 
-          {order?.order_number && (
-            <p className="rounded-2xl bg-navy/5 border border-navy/10 py-4 px-5 text-center">
-              <span className="text-navy/60 font-semibold text-sm">رقم مرجعي للطلب</span>
-              <br />
-              <span className="font-black text-navy text-xl tracking-wide">
-                #{order.order_number}
+          {/* تفاصيل الطلب — جدول COD */}
+
+          <section className="overflow-hidden rounded-2xl border border-white/[0.12] bg-white text-black shadow-[0_24px_80px_-32px_rgba(201,162,77,0.35)]">
+            <div className="flex flex-col gap-2 border-b border-black/10 bg-black px-4 py-3.5 sm:flex-row-reverse sm:items-center sm:justify-between sm:px-5">
+              <h2 className="text-base font-black text-white sm:text-lg">
+                تفاصيل الطلب
+              </h2>
+
+              <span className="inline-flex items-center gap-2 self-start rounded-full border border-gold/50 bg-gold/15 px-3 py-1 text-[11px] font-black text-gold sm:self-auto">
+                <span
+                  className="h-2 w-2 rounded-full bg-gold shadow-[0_0_12px_rgba(201,162,77,0.9)]"
+                  aria-hidden
+                />
+                الدفع عند الاستلام (COD)
               </span>
-            </p>
-          )}
+            </div>
 
-          {/* Window-specific call promise */}
-          <section
-            className={`rounded-2xl p-5 md:p-6 border-2 ${
-              inCallWindow
-                ? "bg-emerald-50 border-emerald-200"
-                : "bg-indigo-50 border-indigo-100"
-            }`}
-          >
-            {inCallWindow ? (
-              <>
-                <p className="font-black text-navy text-lg mb-2">
-                  📞 انتظر مكالمتنا خلال أقل من ١٠ دقائق
-                </p>
-                <p className="text-navy/75 text-sm leading-relaxed mb-4">
-                  ساعات التأكيد الهاتفي: من ٩ صباحاً إلى ٩ مساءً بتوقيت الرياض.
-                  المتصل سيؤكد معك عنوان التوصيل بالكامل — ردّي على أي رقم حتى لو لم
-                  يظهر اسم الشركة؛ هذا طبيعي ومقصود لتقليل الإزعاج.
-                </p>
-                <div className="rounded-xl bg-white/90 border border-emerald-200/80 p-4 text-center shadow-sm">
-                  <p className="text-navy/55 text-xs font-bold mb-1 uppercase tracking-wide">
-                    أقصى مدة لمكالمة التأكيد (تقديراً)
-                  </p>
-                  <p className="text-4xl font-black text-emerald-600 tabular-nums">
-                    {minutes}:{seconds}
-                  </p>
-                  <p className="text-navy/45 text-xs mt-2 font-medium">
-                    خلّي الجوال خارج الوضع الصامت — المكالمة قصيرة وواضحة
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="font-black text-navy text-lg mb-2">
-                  🌙 طلبك مسجّل — أول اتصال في الصباح الباكر
-                </p>
-                <p className="text-navy/75 text-sm leading-relaxed">
-                  خارج ساعات المكالمات (٩ ص–٩ م بتوقيت الرياض). ستصلك مكالتنا ضمن أوّل
-                  جولة اتصالات صباح الغد لتأكيد الطلب والعنوان قبل الشحن — نفس التنبيه:
-                  الرقم قد يظهر بدون اسم تطبيق؛ نرجو الرد لإكمال تأكيدك.
-                </p>
-              </>
+            <div className="-mx-px overflow-x-auto">
+              <table className="w-full min-w-[280px] text-right text-sm">
+                <thead>
+                  <tr className="border-b border-black/[0.08] bg-neutral-50">
+                    <th className="px-3 py-3 text-[11px] font-black text-neutral-600 sm:px-4 sm:text-xs">
+                      رقم الطلب
+                    </th>
+
+                    <th className="px-3 py-3 text-[11px] font-black text-neutral-600 sm:px-4 sm:text-xs">
+                      المنتج
+                    </th>
+
+                    <th className="px-3 py-3 text-[11px] font-black text-neutral-600 sm:whitespace-nowrap sm:px-4 sm:text-xs">
+                      الإجمالي
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr className="border-b border-black/[0.06] align-top">
+                    <td className="px-3 py-4 font-black tabular-nums text-neutral-950 sm:px-4">
+                      {order?.order_number ? `#${order.order_number}` : "—"}
+                    </td>
+
+                    <td className="max-w-[1px] px-3 py-4">
+                      <p className="break-words text-[13px] font-semibold leading-relaxed text-neutral-900">
+                        {productsSummary}
+                      </p>
+                    </td>
+
+                    <td className="whitespace-nowrap px-3 py-4">
+                      <span className="text-base font-black text-gold tabular-nums sm:text-lg">
+                        {order ? formatMoney(order.total) : "—"}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {!order && (
+              <p className="border-t border-black/[0.06] bg-neutral-50 px-4 py-3 text-center text-xs font-semibold text-neutral-500">
+                لم يُعثر على ملخص لهذه الجلسة — إذا أتممت الدفع الآن ستظهر
+                البيانات هنا بعد إعادة التحميل.
+              </p>
             )}
           </section>
 
-          {/* Timeline */}
-          <section className="bg-white rounded-2xl border border-navy/10 p-6 shadow-sm text-right space-y-4">
-            <h2 className="font-black text-navy text-lg">ماذا يحدث خطوة بخطوة؟</h2>
-            <ul className="space-y-3">
-              {[
-                "اتصال قصير: نؤكد المنتج، الكمية، والعنوان الكامل لتفادي تأخير الشحن.",
-                "تجهيز سريع: بعد التأكيد نبدأ تعبئة طلبك بعناية.",
-                "توصيل خلال ٢–٥ أيام عمل — تدفعين نقداً عند الباب بدون بطاقة مسبقة.",
-              ].map((t, i) => (
-                <li key={i} className="flex gap-3 items-start">
-                  <span className="w-7 h-7 rounded-full bg-gold/25 text-navy font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                  <p className="text-navy/75 text-sm leading-relaxed">{t}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <OrderStatusRoadmap />
 
-          {/* Order summary — breathable layout */}
-          {order && lineRows.length > 0 && (
-            <section className="bg-white rounded-2xl border border-navy/10 shadow-sm overflow-hidden text-right">
-              <div className="bg-navy px-5 py-3 flex items-center justify-between">
-                <h2 className="font-black text-white">ملخص الطلب</h2>
-                <span className="text-gold text-xs font-bold">الدفع عند الاستلام</span>
+          {inCallWindow ? (
+            <section className="rounded-2xl border border-emerald-500/25 bg-emerald-950/35 p-4 xs:p-5">
+              <p className="text-base font-black text-white">
+                انتظر مكالمتنا خلال أقل من ١٠ دقائق
+              </p>
+
+              <p className="mt-2 text-[13px] font-medium leading-relaxed text-white/70">
+                ساعات التأكيد الهاتفي: من ٩ صباحًا إلى ٩ مساءً بتوقيت الرياض.
+                الرجاء الإجابة حتى لو لم يظهر اسم المتجر على المتصل.
+              </p>
+
+              <div className="mt-4 rounded-xl border border-white/10 bg-black/50 p-4 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+                  وقت تقريبي لاتصال التأكيد
+                </p>
+
+                <p
+                  className="mt-2 text-4xl font-black tabular-nums text-emerald-400"
+                  aria-live="polite"
+                >
+                  {minutes}:{seconds}
+                </p>
               </div>
-              <div className="divide-y divide-navy/[0.08] px-5 py-1">
+            </section>
+          ) : (
+            <section className="rounded-2xl border border-white/12 bg-[#121212] p-4 xs:p-5">
+              <p className="text-base font-black text-white">
+                طلبك مسجل — سنُكمّل التأكيد في أوّل ساعات العمل القادمة
+              </p>
+
+              <p className="mt-2 text-[13px] font-medium leading-relaxed text-white/65">
+                خارج نافذة الاتصال (٩ ص–٩ م بتوقيت الرياض). ستصلك مكالمتنا
+                لتأكيد الطلب قبل الشحن — الدفع يتم نقدًا عند التسليم.
+              </p>
+            </section>
+          )}
+
+          {/* ملخص الأسطر التفصيلي عند وجود الطلب */}
+
+          {order && lineRows.length > 0 && (
+            <section className="rounded-2xl border border-white/10 bg-[#0e0e0e] px-4 py-5 xs:px-5">
+              <h2 className="text-base font-black text-gold">تفاصيل العناصر</h2>
+
+              <div className="mt-4 divide-y divide-white/[0.08]">
                 {lineRows.map((row) => (
                   <div
                     key={row.key}
-                    className="py-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+                    className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
                   >
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-2 justify-end">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
                         {row.tag && (
-                          <span className="text-[10px] font-black uppercase bg-gold/20 text-navy px-2 py-0.5 rounded-md">
+                          <span className="rounded-md bg-gold/20 px-2 py-0.5 text-[10px] font-black text-gold">
                             {row.tag}
                           </span>
                         )}
-                        <p className="font-bold text-navy text-base leading-snug text-right">
-                          {row.title}
-                        </p>
+
+                        <p className="font-bold text-white">{row.title}</p>
                       </div>
-                      <p className="text-navy/45 text-xs font-medium">{row.subtitle}</p>
+
+                      <p className="mt-1 text-xs font-semibold text-white/45">
+                        {row.subtitle}
+                      </p>
                     </div>
-                    <p className="font-black text-gold text-lg shrink-0 sm:pt-0.5 tabular-nums text-left">
+
+                    <p className="shrink-0 text-left text-lg font-black text-gold tabular-nums sm:text-right">
                       {formatMoney(row.lineTotal)}
                     </p>
                   </div>
                 ))}
               </div>
-              <div className="bg-navy/[0.04] px-5 py-4 flex items-center justify-between border-t border-navy/10">
-                <span className="font-black text-navy">الإجمالي المستحق عند التسليم</span>
-                <span className="font-black text-2xl text-gold tabular-nums">
+
+              <div className="mt-5 flex flex-col gap-1 border-t border-white/10 pt-4 text-right sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-sm font-black text-white/80">
+                  الإجمالي المستحق عند التسليم
+                </span>
+
+                <span className="text-xl font-black text-gold tabular-nums sm:text-2xl">
                   {formatMoney(order.total)}
                 </span>
               </div>
             </section>
           )}
 
-          {/* Excitement / outcome */}
-          <section className="rounded-2xl bg-navy text-white p-6 md:p-7 space-y-4 text-right">
-            <h2 className="font-black text-xl text-gold">لماذا ستفرحين بالمنتج وليس بالتوصيل فقط؟</h2>
-            <p className="text-white/85 text-sm leading-relaxed font-medium">
-              نختار قطع عملية تُقلّل الفوضى والتوتر اليومي داخل السيارة — من تنظيم
-              ظهر المقعد إلى تجنّب ضياع الأغراض في فتحة المقعد ورؤية أوضح عند
-              الاصطفاف. بعد التثبيت، غالب عميلاتنا يلمسن الفرق من أول أسبوع.
+          <section className="rounded-2xl border border-gold/35 bg-gradient-to-br from-neutral-950 to-black px-5 py-6 xs:px-6">
+            <h2 className="text-lg font-black text-gold">
+              لماذا نعتني بالتأكيد قبل الشحن؟
+            </h2>
+
+            <p className="mt-3 text-sm font-medium leading-relaxed text-white/75">
+              لأن تجربة فاخرة تبدأ بخدمة أوضح: نتصل بخطوات قصيرة، نؤكّد عنوانك
+              وبياناتك، ثم نُغلّف طلبك وننجز التوصيل داخل المملكة مع الدفع عند
+              الاستلام.
             </p>
-            <ul className="space-y-2 text-sm text-white/80">
+
+            <ul className="mt-4 space-y-2 text-sm text-white/70">
               {[
-                "تجربة قيادة أهدأ — أغراضك في أماكنها بدل مرميات المقعد.",
-                "جودة خامات تناسب حر الصيف داخل المركبة.",
-                "سياسات واضحة: تأكيد هاتفي، ثم توصيل ودفع عند الاستلام.",
+                "جودة خامات ومظهر حضاري داخل المركبة",
+                "سياسات واضحة ودعم سعودي",
+                "رضاك يهمنا بعد التسليم أيضًا",
               ].map((x) => (
-                <li key={x} className="flex gap-2 justify-end items-start">
+                <li key={x} className="flex gap-2 leading-relaxed">
+                  <span className="shrink-0 text-gold">✦</span>
+
                   <span>{x}</span>
-                  <span className="text-gold shrink-0">✦</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          {/* Social proof */}
-          <section className="rounded-2xl border-2 border-gold/30 bg-white p-6 text-center space-y-3 shadow-sm">
-            <p className="font-black text-navy text-lg">انضمي لآلاف العميلات السعيدات</p>
-            <p className="text-navy/65 text-sm max-w-md mx-auto leading-relaxed">
-              متوسط تقييماتنا فوق{" "}
-              <span className="text-gold font-black">٤،٩/٥</span> — عميلات من الرياض وجدة
-              والدمّام يثقن بالدفع عند الاستلام والتأكيد الهاتفي السريع.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 pt-1">
-              {["دفع عند الاستلام", "شحن خلال أيام عمل", "تأكيد قبل الشحن"].map((c) => (
-                <span
-                  key={c}
-                  className="text-xs font-bold bg-navy/5 text-navy rounded-full px-3 py-1.5 border border-navy/10"
-                >
-                  ✓ {c}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          {/* Product suggestions */}
           {suggestionProducts.length > 0 && (
-            <section className="text-right space-y-4">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-                <h2 className="font-black text-navy text-xl">أضيفي لسيارتك مع طلبك القادم</h2>
-                <p className="text-navy/50 text-sm font-medium">
-                  قطع مكمّلة باقتراح ذكي — عرض واحد نشيطة فيه
+            <section className="space-y-4 text-right">
+              <div>
+                <h2 className="text-lg font-black text-white">قد يهمك أيضًا</h2>
+
+                <p className="mt-1 text-xs font-semibold text-white/45">
+                  قطع مختارة لمقصورة السيارة — تُشحن مع طلبك القادم
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {suggestionProducts.map((p) => (
                   <Link
                     key={p.id}
                     href={`/products/${p.id}`}
-                    className="group bg-white rounded-2xl border border-navy/10 overflow-hidden shadow-sm hover:shadow-md hover:border-gold/40 transition-all flex flex-col"
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101010] transition hover:border-gold/45 hover:shadow-[0_24px_64px_-24px_rgba(201,162,77,0.45)]"
                   >
-                    <div className="relative aspect-[4/3] bg-navy/5">
+                    <div className="relative aspect-[4/5] bg-black/80 sm:aspect-[4/3]">
                       <Image
                         src={p.image}
                         alt={p.nameAr}
                         fill
-                        className="object-contain p-4 group-hover:scale-[1.02] transition-transform duration-300"
-                        sizes="(max-width:640px) 100vw, 50vw"
+                        className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.02]"
+                        sizes="(max-width:640px) 100vw,50vw"
                       />
+
                       {p.badge && (
-                        <span className="absolute top-2 right-2 text-[10px] font-black bg-gold text-white px-2 py-1 rounded-lg shadow">
+                        <span className="absolute top-3 right-3 rounded-lg bg-gold px-2 py-1 text-[10px] font-black text-black shadow-lg">
                           {p.badge}
                         </span>
                       )}
                     </div>
-                    <div className="p-4 flex flex-col flex-1 gap-2 border-t border-navy/5">
-                      <p className="font-bold text-navy group-hover:text-gold transition-colors leading-snug">
+
+                    <div className="flex flex-1 flex-col gap-2 border-t border-white/[0.08] p-4">
+                      <p className="font-bold leading-snug text-white group-hover:text-gold">
                         {p.nameAr}
                       </p>
-                      <p className="text-navy/55 text-xs line-clamp-2">{p.shortBenefit}</p>
-                      <div className="flex items-center justify-between mt-auto pt-2">
-                        <span className="font-black text-gold text-lg">{formatMoney(p.price)}</span>
-                        <span className="text-xs font-black text-white bg-navy rounded-lg px-3 py-1.5 group-hover:bg-navy/90">
-                          عرض التفاصيل ←
+
+                      <p className="line-clamp-2 text-[11px] font-medium text-white/45">
+                        {p.shortBenefit}
+                      </p>
+
+                      <div className="mt-auto flex items-center justify-between pt-3">
+                        <span className="text-lg font-black text-gold tabular-nums">
+                          {formatMoney(p.price)}
+                        </span>
+
+                        <span className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-black text-black">
+                          التفاصيل ←
                         </span>
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
+
               <Link
                 href="/shop"
-                className="block btn-navy text-center text-base py-4 !rounded-xl"
+                className="block rounded-xl bg-gold py-4 text-center text-base font-black text-black active:scale-[0.98]"
               >
-                تصفّحي كل المنتجات
+                تصفّح المنتجات
               </Link>
             </section>
           )}
 
-          <div className="text-center pb-8">
-            <Link href="/" className="text-navy/50 hover:text-navy font-bold text-sm underline-offset-4 hover:underline">
-              العودة للرئيسية
+          <div className="pb-6 text-center">
+            <Link
+              href="/"
+              className="text-xs font-bold text-white/45 underline-offset-4 transition hover:text-gold hover:underline xs:text-sm"
+            >
+              العودة إلى الصفحة الرئيسية
             </Link>
           </div>
         </div>

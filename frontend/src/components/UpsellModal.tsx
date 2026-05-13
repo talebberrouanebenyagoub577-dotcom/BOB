@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/lib/store";
 import { PRODUCTS, UPSELL_PRICE } from "@/data/products";
@@ -108,6 +109,16 @@ export function UpsellModal() {
             أضيفي {upsellProduct.shortAr}
           </h3>
           <p className="text-navy/60 text-sm">{upsellProduct.descriptionAr}</p>
+        </div>
+
+        <div className="relative w-full aspect-[16/11] max-h-[220px] sm:max-h-[260px] mx-auto rounded-2xl overflow-hidden bg-navy/5">
+          <Image
+            src={upsellProduct.image}
+            alt={upsellProduct.nameAr}
+            fill
+            className="object-contain object-center p-2 sm:p-4"
+            sizes="(max-width:768px) 90vw, 400px"
+          />
         </div>
 
         {/* Price */}
