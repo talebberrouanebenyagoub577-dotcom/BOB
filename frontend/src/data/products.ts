@@ -10,7 +10,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "منظّم ذكي يحوّل مقعد سيارتك إلى مساحة منظمة بالكامل. جيوب متعددة، تصميم مرن، تركيب في دقيقتين.",
     price: 199,
-    image: "/product-detail/seat-organizer.png",
+    image: "/product-detail/seat-organizer.svg",
     badge: "الأكثر مبيعاً",
     reviewCount: 284,
     rating: 5,
@@ -30,7 +30,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "يسد الفجوة بين المقعد والكونسول نهائياً. لا مزيد من فقدان المفاتيح أو الجوال أو العملات.",
     price: 199,
-    image: "/product-detail/seatgap-protector.png",
+    image: "/product-detail/seatgap-protector.svg",
     badge: "مشكلة يومية",
     reviewCount: 197,
     rating: 5,
@@ -50,7 +50,7 @@ export const PRODUCTS: Product[] = [
     descriptionAr:
       "عدسة واسعة الزاوية تُريك الزوايا العمياء بوضوح تام. ثبّتها على مرآتك الخارجية وتخلص من قلق الاصطفاف.",
     price: 199,
-    image: "/product-detail/parking-mirror.png",
+    image: "/product-detail/parking-mirror.svg",
     badge: "ثقة بالقيادة",
     reviewCount: 156,
     rating: 5,

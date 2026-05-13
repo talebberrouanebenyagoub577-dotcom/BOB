@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { CartProvider, useCart } from "./store/cartStore";
 import { PRODUCTS } from "./data/products";
@@ -148,6 +148,7 @@ function Storefront() {
       <Routes>
         <Route path="/"                   element={<HomePage />} />
         <Route path="/collection"         element={<CollectionPage />} />
+        <Route path="/products"           element={<Navigate to="/collection" replace />} />
         <Route path="/products/:id"       element={<ProductPage />} />
         <Route path="/about"              element={<AboutPage />} />
         <Route path="/contact"            element={<ContactPage />} />

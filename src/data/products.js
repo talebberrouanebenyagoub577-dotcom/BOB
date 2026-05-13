@@ -19,7 +19,7 @@ export const PRODUCTS = [
     idealFor:
       "من يقضي وقتاً طويلاً في السيارة، عائلات، وسائقي أوبر/التوصيل، أو كل من يريد مظهراً أنظف وأكثر احترافية داخل المقصورة.",
     price: 199,
-    image: "/product-detail/seat-organizer.png",
+    image: "/product-detail/seat-organizer.svg",
     badge: "الأكثر مبيعاً",
     reviewCount: 284,
     rating: 5,
@@ -62,7 +62,7 @@ export const PRODUCTS = [
     idealFor:
       "من يضع الجوال أو المحفظة بجانب الكونسول، عائلات مع أغراض صغيرة للأطفال، وكل من تعب من البحث تحت المقعد في مواقف الشمس.",
     price: 199,
-    image: "/product-detail/seatgap-protector.png",
+    image: "/product-detail/seatgap-protector.svg",
     badge: "مشكلة يومية",
     reviewCount: 197,
     rating: 5,
@@ -106,7 +106,7 @@ export const PRODUCTS = [
     idealFor:
       "سائقي السيدان والـ SUV في المدن، مَن يركن يومياً قريباً من الرصيف، والمبتدئين الذين يريدون ثقة إضافية دون تعديل كهربائي مكلف.",
     price: 199,
-    image: "/product-detail/parking-mirror.png",
+    image: "/product-detail/parking-mirror.svg",
     badge: "ثقة بالقيادة",
     reviewCount: 156,
     rating: 5,

@@ -13,6 +13,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      { source: "/products", destination: "/shop", permanent: false },
+    ];
+  },
+
   async rewrites() {
     const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://backend:8000";
     return [
