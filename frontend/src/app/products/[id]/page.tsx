@@ -50,7 +50,8 @@ export default async function ProductPage({ params }: Props) {
       <CheckoutPopup />
       <UpsellModal />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="catalog-page-bg pb-14">
+        <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* معرض صفحة المنتج — ملفات في /public/product-detail */}
           <div className="aspect-[4/3] bg-navy/5 rounded-2xl overflow-hidden flex items-center justify-center">
@@ -165,6 +166,7 @@ export default async function ProductPage({ params }: Props) {
             ))}
           </div>
         </section>
+        </div>
       </main>
 
       {/* Sticky mobile CTA */}

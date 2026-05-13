@@ -27,6 +27,11 @@
 }
 
 @layer utilities {
+  /** خلفية صفحات الكتالوج والمنتج — نفس منظومة الرئيسية (كريم + لمسة كحلي وذهبي فاتح) */
+  .catalog-page-bg {
+    @apply min-h-[65vh] bg-gradient-to-b from-navy/[0.07] via-cream via-[38%] to-gold-pale/50;
+  }
+
   .btn-gold {
     @apply bg-gold text-white font-bold rounded-xl py-4 px-6 text-lg
            active:scale-95 transition-transform duration-150
