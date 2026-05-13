@@ -10,6 +10,7 @@ import { PRODUCTS } from "@/data/products";
 import { ProductViewTracker } from "@/components/ProductViewTracker";
 import { BRAND, defaultSiteTitle } from "@/lib/brand";
 import { getProductPageHeroUrl, PRODUCT_PAGE_SHARED_SRC, PRODUCT_PAGE_HIGHLIGHT_IMAGES } from "@/lib/bundledProductMedia";
+import { catalogMainSurfaceStyle } from "@/lib/catalogSurfaceStyle";
 
 /** يمنع الاعتماد على نسخ HTML معادّة توليدها في بناء قديم كانت تُرجع 404 لـ /products/[id] */
 export const dynamic = "force-dynamic";
@@ -50,7 +51,7 @@ export default async function ProductPage({ params }: Props) {
       <CheckoutPopup />
       <UpsellModal />
 
-      <main className="catalog-page-bg pb-14">
+      <main className="w-full pb-14" style={catalogMainSurfaceStyle}>
         <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* معرض صفحة المنتج — ملفات في /public/product-detail */}

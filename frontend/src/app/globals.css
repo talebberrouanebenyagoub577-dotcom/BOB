@@ -27,26 +27,6 @@
 }
 
 @layer utilities {
-  /**
-   * خلفية صفحة المتجر والمنتج — CSS صريح (أقوى من Tailwind @apply للتدرّجات المركّبة)
-   * ألوان من الهوية: navy #0B1628 ، cream #F6F4EF ، gold pale #F5ECD8
-   */
-  .catalog-page-bg {
-    min-height: 100vh;
-    min-height: 100dvh;
-    background-color: #ebe4d6;
-    background-image: linear-gradient(
-      to bottom,
-      rgba(11, 22, 40, 0.13) 0%,
-      #f4f1ea 14%,
-      #f6f4ef 42%,
-      #efe8da 72%,
-      #e8dfcf 100%
-    );
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-  }
-
   .btn-gold {
     @apply bg-gold text-white font-bold rounded-xl py-4 px-6 text-lg
            active:scale-95 transition-transform duration-150

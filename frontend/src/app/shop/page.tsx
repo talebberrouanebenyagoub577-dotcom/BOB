@@ -6,6 +6,7 @@ import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { PRODUCTS, PRICE_TIERS } from "@/data/products";
 import { BRAND } from "@/lib/brand";
+import { catalogMainSurfaceStyle } from "@/lib/catalogSurfaceStyle";
 
 export const metadata = { title: "المنتجات" };
 
@@ -17,7 +18,7 @@ export default function CollectionPage() {
       <CheckoutPopup />
       <UpsellModal />
 
-      <main className="catalog-page-bg">
+      <main className="w-full" style={catalogMainSurfaceStyle}>
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="text-center mb-10">
             <div
