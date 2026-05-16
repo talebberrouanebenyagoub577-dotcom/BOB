@@ -1,5 +1,5 @@
-/** مكوّن مشترك لقسم الصورة/النص المتناوب (15:10) في متجر Vite */
-export function ProductPdpStoryVite({ title, blocks }) {
+/** مكوّن مشترك لقسم الصورة/النص المتناوب في متجر Vite */
+export function ProductPdpStoryVite({ title, blocks, squareMedia = false }) {
   return (
     <div className="pdp-parking-story">
       <h2 className="pdp-parking-story__title">{title}</h2>
@@ -8,7 +8,9 @@ export function ProductPdpStoryVite({ title, blocks }) {
           key={b.key}
           className={`pdp-zigzag-row ${i % 2 === 1 ? "pdp-zigzag-row--reverse" : ""}`}
         >
-          <div className="pdp-zigzag-media">
+          <div
+            className={`pdp-zigzag-media${squareMedia ? " pdp-zigzag-media--square" : ""}`}
+          >
             <img src={b.imageSrc} alt={b.title} loading={i < 2 ? "eager" : "lazy"} decoding="async" />
           </div>
           <div className="pdp-zigzag-text">

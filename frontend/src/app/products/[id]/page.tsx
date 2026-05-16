@@ -97,9 +97,11 @@ export default async function ProductPage({ params }: Props) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-start">
               <div
                 className={`rounded-3xl bg-gradient-to-br from-navy/[0.04] via-white to-gold/[0.06] border border-navy/10 shadow-sm overflow-hidden w-full flex items-center justify-center ${
-                  isWidePdpHero
-                    ? "aspect-[15/14] max-sm:min-h-[min(320px,88vw)] sm:aspect-[15/11] md:aspect-[15/10] xl:max-h-[540px]"
-                    : "aspect-[4/5] max-sm:min-h-[min(300px,85vw)] sm:aspect-[4/3] lg:aspect-[16/13]"
+                  product.id === "parking-mirror"
+                    ? "aspect-square max-sm:min-h-[min(300px,88vw)] xl:max-h-[520px]"
+                    : isWidePdpHero
+                      ? "aspect-[15/14] max-sm:min-h-[min(320px,88vw)] sm:aspect-[15/11] md:aspect-[15/10] xl:max-h-[540px]"
+                      : "aspect-[4/5] max-sm:min-h-[min(300px,85vw)] sm:aspect-[4/3] lg:aspect-[16/13]"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -194,6 +196,9 @@ export default async function ProductPage({ params }: Props) {
                 title={extras.zigzagLeadAr}
                 ariaLabel={`تفاصيل إضافية ${product.nameAr}`}
                 blocks={blocks}
+                imageFrame={
+                  product.id === "parking-mirror" ? "square" : "default"
+                }
               />
             )}
 

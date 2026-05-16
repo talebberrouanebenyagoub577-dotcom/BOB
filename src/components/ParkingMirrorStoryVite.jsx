@@ -6,6 +6,7 @@ export function ParkingMirrorStoryVite() {
     <ProductPdpStoryVite
       title="ليش مرايا الركن الدقيقة تفرق في قيادتك؟"
       blocks={PARKING_MIRROR_STORY_BLOCKS}
+      squareMedia
     />
   );
 }

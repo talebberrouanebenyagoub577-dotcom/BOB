@@ -23,7 +23,8 @@ interface StickyBarProps {
 
 export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
   const { product, qty, setQty } = usePdpQty();
-  const { addItem, openCheckout } = useCartStore();
+  const { addItem, openCheckout, isCheckoutOpen, isDrawerOpen, isUpsellOpen } =
+    useCartStore();
   const barRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -48,7 +49,9 @@ export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
 
   const price = getTierPrice(qty);
 
-  if (!showWhenBuyHidden) return null;
+  /* لا يُعرض فوق نافذة التحقّق أو السلة أو العرض الإضافي (نفس طبقة z تقريباً) */
+  if (!showWhenBuyHidden || isCheckoutOpen || isDrawerOpen || isUpsellOpen)
+    return null;
 
   return (
     <footer

@@ -30,7 +30,7 @@ export function CartDrawer() {
       {/* Backdrop */}
       <div
         className={clsx(
-          "fixed inset-0 bg-black/50 z-50 transition-opacity duration-300",
+          "fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300",
           isDrawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={closeDrawer}
@@ -39,7 +39,7 @@ export function CartDrawer() {
       {/* Drawer — slides from RIGHT (RTL) */}
       <div
         className={clsx(
-          "fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300",
+          "fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[70] shadow-2xl flex flex-col transition-transform duration-300",
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
         )}
       >

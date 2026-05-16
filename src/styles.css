@@ -517,11 +517,16 @@ img { display: block; max-width: 100%; }
   box-sizing: border-box;
 }
 .main-img--parking-hero {
-  aspect-ratio: 15 / 13;
-  min-height: min(85vw, 420px);
+  aspect-ratio: 1 / 1;
+  min-height: min(88vw, 360px);
+  max-height: 520px;
 }
 @media (min-width: 640px) {
-  .main-img--parking-hero { aspect-ratio: 15 / 10; min-height: 0; }
+  .main-img--parking-hero {
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    max-height: 520px;
+  }
 }
 
 .product-badge-lg {
@@ -990,6 +995,20 @@ img { display: block; max-width: 100%; }
   object-position: center;
   padding: clamp(6px, 2.8vw, 20px);
   box-sizing: border-box;
+}
+/* إطار 1:1 متناسق لصور طقم المرايا (وما شابهها من أصول مربّعة) */
+.pdp-zigzag-media.pdp-zigzag-media--square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: min(100%, 520px);
+  min-height: min(88vw, 360px);
+  margin-inline: auto;
+}
+@media (min-width: 640px) {
+  .pdp-zigzag-media.pdp-zigzag-media--square {
+    min-height: 0;
+    max-height: 520px;
+  }
 }
 .pdp-zigzag-text { flex: 1; text-align: right; }
 .pdp-zigzag-heading {

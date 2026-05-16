@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useCartStore } from "@/lib/store";
 import { PRODUCTS, UPSELL_PRICE } from "@/data/products";
 import { trackPurchase } from "@/lib/pixels";
+import { formatOrderApiError } from "@/lib/formatOrderApiError";
 
 const COUNTDOWN_SECONDS = 12;
 
@@ -38,15 +40,24 @@ export function UpsellModal() {
   const finalize = async (accepted: boolean) => {
     setError("");
     const raw = sessionStorage.getItem("pending_order");
-    if (!raw) return;
+    if (!raw) {
+      setError("لم نجد بيانات الطلب. غادر أو أعد المحاولة من السلة.");
+      return;
+    }
 
-    const pending = JSON.parse(raw) as {
+    let pending: {
       total: number;
       event_id: string;
       session_id?: string;
       items: { sku: string; qty: number; unit_price: number; name_ar: string }[];
       [key: string]: unknown;
     };
+    try {
+      pending = JSON.parse(raw) as typeof pending;
+    } catch {
+      setError("بيانات الطلب تالفة. أعد المحاولة من السلة.");
+      return;
+    }
     const upsellDelta = accepted && upsellProduct ? UPSELL_PRICE : 0;
     const payload = {
       ...pending,
@@ -68,11 +79,19 @@ export function UpsellModal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("order failed");
-      const data = await res.json();
+      let data: Record<string, unknown> = {};
+      try {
+        data = (await res.json()) as Record<string, unknown>;
+      } catch {
+        /* تجاهل */
+      }
+      if (!res.ok) {
+        setError(formatOrderApiError(res, data));
+        return;
+      }
       sessionStorage.setItem("last_order", JSON.stringify({ ...payload, ...data }));
     } catch {
-      setError("حدث خطأ في إرسال الطلب، يرجى المحاولة مرة أخرى");
+      setError("تعذّر الاتصال بالخادم. تحقق من أن الخلفية تعمل ثم أعد المحاولة.");
       return;
     }
 
@@ -86,9 +105,9 @@ export function UpsellModal() {
 
   if (!isUpsellOpen || !upsellProduct) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/70 z-60 flex items-end md:items-center justify-center p-0 md:p-4">
-      <div className="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-2xl p-6 space-y-5">
+  const overlay = (
+    <div className="fixed inset-0 bg-black/70 z-[210] flex items-end md:items-center justify-center p-0 md:p-4">
+      <div className="relative z-[211] bg-white w-full md:max-w-md md:rounded-2xl rounded-t-2xl p-6 space-y-5 shadow-2xl">
         {/* Countdown bar */}
         <div className="relative h-1.5 bg-navy/10 rounded-full overflow-hidden">
           <div
@@ -149,4 +168,8 @@ export function UpsellModal() {
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(overlay, document.body)
+    : null;
 }

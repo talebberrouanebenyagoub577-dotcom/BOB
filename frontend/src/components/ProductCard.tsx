@@ -22,7 +22,7 @@ function Stars({ count = 5 }: { count?: number }) {
 }
 
 export function ProductCard({ product }: Props) {
-  const { addItem, openCheckout } = useCartStore();
+  const { addItem, openCheckout, isCheckoutOpen } = useCartStore();
 
   const handleBuy = () => {
     addItem(product, 1);
@@ -111,12 +111,14 @@ export function ProductCard({ product }: Props) {
 
         {/* CTAs */}
         <div className="flex gap-2 mt-auto">
-          <button onClick={handleBuy} className="btn-gold flex-1">
-            اشتري الآن
-          </button>
+          {!isCheckoutOpen && (
+            <button type="button" onClick={handleBuy} className="btn-gold flex-1">
+              اشتري الآن
+            </button>
+          )}
           <Link
             href={`/products/${product.id}`}
-            className="border border-navy/20 text-navy font-bold rounded-xl py-3 px-4 text-sm hover:bg-navy/5 transition-colors"
+            className={`border border-navy/20 text-navy font-bold rounded-xl py-3 px-4 text-sm hover:bg-navy/5 transition-colors ${isCheckoutOpen ? "flex-1 text-center" : ""}`}
           >
             تفاصيل
           </Link>

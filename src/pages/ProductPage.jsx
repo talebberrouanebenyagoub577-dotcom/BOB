@@ -39,7 +39,7 @@ function FaqItem({ q, a }) {
 export default function ProductPage() {
   const { id } = useParams();
   const product = PRODUCTS.find((p) => p.id === id);
-  const { addToCart } = useCart();
+  const { addToCart, isCheckoutOpen } = useCart();
   const [selectedQty, setSelectedQty] = useState(1);
 
   if (!product) return <Navigate to="/collection" replace />;
@@ -74,13 +74,14 @@ export default function ProductPage() {
             <div className="product-gallery">
               <div
                 className={`main-img ${
-                  product.id === "parking-mirror" ||
-                  product.id === "seat-organizer" ||
-                  product.id === "seatgap-protector"
-                    ? "main-img--detail-hero main-img--pdp-hero"
-                    : detailHeroSrc
-                      ? "main-img--detail-hero"
-                      : ""
+                  product.id === "parking-mirror"
+                    ? "main-img--detail-hero main-img--parking-hero"
+                    : product.id === "seat-organizer" ||
+                        product.id === "seatgap-protector"
+                      ? "main-img--detail-hero main-img--pdp-hero"
+                      : detailHeroSrc
+                        ? "main-img--detail-hero"
+                        : ""
                 }`}
               >
                 <img
@@ -146,23 +147,25 @@ export default function ProductPage() {
                     {selectedQty === 1 ? "· قطعة واحدة" : `· ${selectedQty} قطع`}
                   </span>
                 </div>
-                <div className="price-tier-list">
-                  {PRICING.map((tier) => (
-                    <button
-                      key={tier.qty}
-                      type="button"
-                      className={`price-tier-item ${selectedQty === tier.qty ? "active-tier" : ""}`}
-                      onClick={() => setSelectedQty(tier.qty)}
-                      style={{ background: "none", border: "1px solid", borderColor: selectedQty === tier.qty ? "var(--gold)" : "var(--gray-200)", cursor: "pointer", borderRadius: 8, textAlign: "right", fontFamily: "var(--font)", transition: "all .15s" }}
-                    >
-                      <span className="qty-label">{tier.label}</span>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span className="qty-price">{tier.price} ر.س</span>
-                        {tier.save && <span className="qty-save">{tier.save}</span>}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                {!isCheckoutOpen && (
+                  <div className="price-tier-list">
+                    {PRICING.map((tier) => (
+                      <button
+                        key={tier.qty}
+                        type="button"
+                        className={`price-tier-item ${selectedQty === tier.qty ? "active-tier" : ""}`}
+                        onClick={() => setSelectedQty(tier.qty)}
+                        style={{ background: "none", border: "1px solid", borderColor: selectedQty === tier.qty ? "var(--gold)" : "var(--gray-200)", cursor: "pointer", borderRadius: 8, textAlign: "right", fontFamily: "var(--font)", transition: "all .15s" }}
+                      >
+                        <span className="qty-label">{tier.label}</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span className="qty-price">{tier.price} ر.س</span>
+                          {tier.save && <span className="qty-save">{tier.save}</span>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Benefits */}
@@ -176,13 +179,15 @@ export default function ProductPage() {
               </div>
 
               {/* CTA */}
-              <button
-                className="btn btn-gold btn-full btn-lg"
-                onClick={handleBuy}
-                type="button"
-              >
-                اشتري الآن — الدفع عند الاستلام
-              </button>
+              {!isCheckoutOpen && (
+                <button
+                  className="btn btn-gold btn-full btn-lg"
+                  onClick={handleBuy}
+                  type="button"
+                >
+                  اشتري الآن — الدفع عند الاستلام
+                </button>
+              )}
 
               {/* COD Trust */}
               <div className="cod-trust-bar">
@@ -259,10 +264,16 @@ export default function ProductPage() {
                       <span style={{ fontSize: 14, color: "var(--gray-600)" }}>ر.س</span>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <button className="btn btn-gold btn-full" onClick={() => addToCart(cp.id)} type="button">
-                        اشتري الآن
-                      </button>
-                      <Link to={`/products/${cp.id}`} className="btn btn-ghost">
+                      {!isCheckoutOpen && (
+                        <button className="btn btn-gold btn-full" onClick={() => addToCart(cp.id)} type="button">
+                          اشتري الآن
+                        </button>
+                      )}
+                      <Link
+                        to={`/products/${cp.id}`}
+                        className="btn btn-ghost"
+                        style={isCheckoutOpen ? { flex: 1, textAlign: "center" } : undefined}
+                      >
                         تفاصيل
                       </Link>
                     </div>
@@ -275,15 +286,17 @@ export default function ProductPage() {
       )}
 
       {/* Sticky CTA bar (mobile only, shown via CSS) */}
-      <div className="sticky-cta-bar">
-        <div>
-          <div className="sticky-price">{selectedTier.price} ر.س</div>
-          <div className="sticky-sub">الدفع عند الاستلام · {selectedQty === 1 ? "قطعة" : `${selectedQty} قطع`}</div>
+      {!isCheckoutOpen && (
+        <div className="sticky-cta-bar">
+          <div>
+            <div className="sticky-price">{selectedTier.price} ر.س</div>
+            <div className="sticky-sub">الدفع عند الاستلام · {selectedQty === 1 ? "قطعة" : `${selectedQty} قطع`}</div>
+          </div>
+          <button className="btn btn-gold" onClick={handleBuy} type="button">
+            اشتري الآن ←
+          </button>
         </div>
-        <button className="btn btn-gold" onClick={handleBuy} type="button">
-          اشتري الآن ←
-        </button>
-      </div>
+      )}
     </>
   );
 }

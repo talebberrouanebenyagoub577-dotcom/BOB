@@ -20,7 +20,8 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://backend:8000";
+    /** بدون Docker: شغّل FastAPI محلياً (:8000). في Docker يُعدَّل عبر BACKEND_INTERNAL_URL */
+    const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
     return [
       {
         source: "/api/:path*",

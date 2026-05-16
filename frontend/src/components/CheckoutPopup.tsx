@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useCartStore } from "@/lib/store";
 import { generateEventId } from "@/lib/eventId";
 import { getTrackingSessionId } from "@/lib/serverTrack";
 import clsx from "clsx";
 import { isValidSaudiPhone, normalizeSaudiPhone } from "@/lib/saudiPhone";
+import { PRODUCTS } from "@/data/products";
+import { formatOrderApiError } from "@/lib/formatOrderApiError";
 
 export function CheckoutPopup() {
   const { items, isCheckoutOpen, closeCheckout, openUpsell, upsellShownThisSession, total, clearCart } =
@@ -42,42 +45,69 @@ export function CheckoutPopup() {
       session_id: getTrackingSessionId(),
     }));
 
-    closeCheckout();
-    setLoading(false);
+    const cartSkus = new Set(items.map((i) => i.product.sku));
+    const upsellCandidate = PRODUCTS.some((p) => !cartSkus.has(p.sku));
 
-    if (!upsellShownThisSession) {
+    /* لا تُغلق نافذة الدفع قبل إرسال الطلب عند تخطّي العرض الإضافي — وإلا تختفي رسالة الخطأ */
+    if (!upsellShownThisSession && upsellCandidate) {
+      closeCheckout();
+      setLoading(false);
       openUpsell();
-    } else {
-      await submitOrder(false);
+      return;
     }
+
+    await submitOrder(false);
+    setLoading(false);
   };
 
   async function submitOrder(upsellAccepted: boolean) {
     const raw = sessionStorage.getItem("pending_order");
-    if (!raw) return;
-    const payload = { ...JSON.parse(raw), upsell_accepted: upsellAccepted };
+    if (!raw) {
+      setError("لم نجد بيانات الطلب. أعد فتح السلة وحاول مرة أخرى.");
+      setLoading(false);
+      return;
+    }
+    let base: Record<string, unknown>;
+    try {
+      base = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      setError("بيانات الطلب تالفة. أعد المحاولة من البداية.");
+      setLoading(false);
+      return;
+    }
+    const payload = { ...base, upsell_accepted: upsellAccepted };
     try {
       const res = await fetch("/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("order failed");
-      const data = await res.json();
+      let data: Record<string, unknown> = {};
+      try {
+        data = (await res.json()) as Record<string, unknown>;
+      } catch {
+        /* تجاهل — قد يكون جسم HTML من البروكسي */
+      }
+      if (!res.ok) {
+        setError(formatOrderApiError(res, data));
+        setLoading(false);
+        return;
+      }
       sessionStorage.setItem("last_order", JSON.stringify({ ...payload, ...data }));
       clearCart();
       window.location.href = "/thank-you";
     } catch {
-      setError("حدث خطأ، يرجى المحاولة مرة أخرى");
+      setError("تعذّر الاتصال بالخادم. تحقق من الإنترنت أو أن الخلفية تعمل.");
       setLoading(false);
     }
   }
 
   if (!isCheckoutOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-end md:items-center justify-center p-0 md:p-4">
-      <div className="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-2xl max-h-[95dvh] overflow-y-auto">
+  /* portal + طبقة أعلى من الشريط الثابت وأي عنصر داخل سياق تراكب في الصفحة */
+  const overlay = (
+    <div className="fixed inset-0 bg-black/60 z-[200] flex items-end md:items-center justify-center p-0 md:p-4">
+      <div className="relative z-[201] bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-2xl max-h-[95dvh] overflow-y-auto shadow-2xl">
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 md:hidden">
           <div className="w-12 h-1.5 bg-navy/20 rounded-full" />
@@ -198,4 +228,8 @@ export function CheckoutPopup() {
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(overlay, document.body)
+    : null;
 }
