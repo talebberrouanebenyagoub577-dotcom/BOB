@@ -19,15 +19,29 @@ function useBuyZoneOffScreen() {
   const [offScreen, setOffScreen] = useState(false);
 
   useEffect(() => {
-    const sentinel = document.getElementById("pdp-buy-zone");
-    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+    let obs: IntersectionObserver | null = null;
 
-    const obs = new IntersectionObserver(
-      ([e]) => setOffScreen(e.intersectionRatio < 0.2),
-      { threshold: [0, 0.2, 0.5, 1], rootMargin: "0px 0px -48px 0px" }
-    );
-    obs.observe(sentinel);
-    return () => obs.disconnect();
+    const attach = () => {
+      const sentinel = document.getElementById("pdp-buy-zone");
+      if (!sentinel || typeof IntersectionObserver === "undefined") return false;
+
+      obs = new IntersectionObserver(
+        ([e]) => setOffScreen(!e.isIntersecting),
+        { threshold: 0, rootMargin: "0px 0px -20px 0px" }
+      );
+      obs.observe(sentinel);
+      return true;
+    };
+
+    if (!attach()) {
+      const retry = window.setTimeout(() => attach(), 150);
+      return () => {
+        window.clearTimeout(retry);
+        obs?.disconnect();
+      };
+    }
+
+    return () => obs?.disconnect();
   }, []);
 
   return offScreen;
