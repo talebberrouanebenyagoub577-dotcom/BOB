@@ -21,7 +21,7 @@ function validate(values) {
   if (!values.name.trim() || values.name.trim().length < 2) errors.name = "الاسم مطلوب (حرفان على الأقل)";
   if (!isValidSaudiPhone(values.phone))
     errors.phone =
-      "رقم الجوال لازم يكون سعودي (مثال: 0550603022 أو نفس الرقم بصيغة +966… أو 00966…)";
+      "رقم الجوال لازم يكون سعودي (مثال: 05XXXXXXXX أو +9665XXXXXXXX)";
   return errors;
 }
 
@@ -140,7 +140,7 @@ export default function CheckoutPopup({ onOrderConfirmed }) {
                   value={values.phone}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="+966550603022 أو 0550603022"
+                  placeholder="05XXXXXXXX"
                   maxLength={22}
                   autoComplete="tel"
                 />

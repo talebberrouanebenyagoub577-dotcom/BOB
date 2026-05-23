@@ -21,14 +21,6 @@ export default function Footer() {
             <p className="footer-desc">
               {BRAND.footerBlurbAr}
             </p>
-            <p style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.15)" }}>
-              <span style={{ display: "block", fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,.38)", marginBottom: 6 }}>
-                التواصل الهاتفي
-              </span>
-              <a href={`tel:${BRAND.contactPhoneIntl}`} dir="ltr" style={{ fontSize: 17, fontWeight: 900, color: "var(--gold)", fontVariantNumeric: "tabular-nums" }}>
-                {BRAND.contactPhoneIntl}
-              </a>
-            </p>
           </div>
 
           {/* Pages */}

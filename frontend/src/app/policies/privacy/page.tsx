@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ContactPhoneSheet } from "@/components/ContactPhoneSheet";
 import { BRAND } from "@/lib/brand";
 
 export const metadata = { title: "سياسة الخصوصية" };
@@ -17,12 +16,8 @@ export default function PrivacyPage() {
         <ul className="list-disc pr-6 space-y-2">
           <li>نجمع مثلًا الاسم ورقم الجوال وعنوان التوصيل لخدمة الشحن والتأكيد.</li>
           <li>لا نبيع بياناتك لأطراف ثالثة لأغراض تسويقية خارجية.</li>
-          <li>يمكنك طلب تصحيح أو حذف بيانات الاتصال عبر الاتصال بالرقم الرسمي الموحَّد أدناه.</li>
+          <li>يمكنك طلب تصحيح أو حذف بيانات الاتصال عبر صفحة تواصل معنا.</li>
         </ul>
-
-        <div className="not-prose my-10">
-          <ContactPhoneSheet />
-        </div>
       </main>
       <Footer />
     </>

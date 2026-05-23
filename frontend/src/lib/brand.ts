@@ -18,13 +18,7 @@ export const BRAND = {
   metaDescriptionAr:
     "نيدها أوتو: إكسسوارات سيارة داخلية مختارة بعناية في السعودية — تنظيم المقعد، حماية فراغ المقعد، مرايا مساعدة للركن. الدفع عند الاستلام وتوصيل سريع.",
   domain: "https://nidhamauto.shop",
-  /** رقم التواصل الرسمي الموحّد المعروَض على الموقع (تنسيق دولي مع +) */
-  contactPhoneIntl: "+966550603022",
 } as const;
-
-export function contactPhoneHref(): string {
-  return `tel:${BRAND.contactPhoneIntl}`;
-}
 
 export function pageTitle(pageName: string): string {
   return `${pageName} | ${BRAND.nameAr}`;

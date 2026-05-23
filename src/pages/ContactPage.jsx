@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { BRAND } from "../brand.js";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -32,15 +31,6 @@ export default function ContactPage() {
 
       <section className="section" style={{ background: "var(--gray-50)" }}>
         <div className="container">
-          <div className="contact-phone-sheet mb-10" style={{ maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
-            <p className="contact-phone-sheet__title">الرقم الموحَّد للتواصل</p>
-            <p className="contact-phone-sheet__sub">
-              هذا هو الرقم الرسمي الوحيد في المتجر؛ يمكنك الضغط للاتصال مباشرة.
-            </p>
-            <a href={`tel:${BRAND.contactPhoneIntl}`} className="contact-phone-sheet__link" dir="ltr">
-              {BRAND.contactPhoneIntl}
-            </a>
-          </div>
           <div className="contact-wrap">
             {/* Form */}
             <div className="contact-form-card">

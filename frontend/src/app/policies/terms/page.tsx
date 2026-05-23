@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { ContactPhoneSheet } from "@/components/ContactPhoneSheet";
 import { BRAND } from "@/lib/brand";
 
 export const metadata = { title: "الشروط والأحكام" };
@@ -22,15 +21,7 @@ export default function TermsPage() {
             التزامنا بالمتابعة معك بحسن نية.
           </li>
           <li>جميع الأسعار المعروضة بالريال السعودي كما هو موضح في صفحة الدفع، ما لم يُعلَن غير ذلك.</li>
-          <li>
-            الرقم الموحَّد لتأكيد الطلبات أو الاستفسارات الرسمية هو الرقم الموضَّح في اللوحة أدناه،
-            ولا نستخدم لهذا الغرض أرقامًا بديلة في الوثائق الرسمية.
-          </li>
         </ul>
-
-        <div className="not-prose my-10">
-          <ContactPhoneSheet />
-        </div>
       </main>
       <Footer />
     </>

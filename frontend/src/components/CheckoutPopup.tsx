@@ -188,7 +188,7 @@ export function CheckoutPopup() {
                 dir="ltr"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+966550603022 أو 0550603022"
+                placeholder="05XXXXXXXX"
                 maxLength={22}
                 className={clsx(
                   "w-full border-2 rounded-xl px-4 py-3 font-mono tracking-wider text-navy outline-none transition-colors",
