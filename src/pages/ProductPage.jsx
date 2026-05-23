@@ -283,18 +283,6 @@ export default function ProductPage() {
         </section>
       )}
 
-      {/* Sticky CTA bar (mobile only, shown via CSS) */}
-      {!isCheckoutOpen && (
-        <div className="sticky-cta-bar">
-          <div>
-            <div className="sticky-price">{selectedTier.price} ر.س</div>
-            <div className="sticky-sub">الدفع عند الاستلام · {selectedQty === 1 ? "قطعة" : `${selectedQty} قطع`}</div>
-          </div>
-          <button className="btn btn-gold" onClick={handleBuy} type="button">
-            اشتري الآن ←
-          </button>
-        </div>
-      )}
     </>
   );
 }
