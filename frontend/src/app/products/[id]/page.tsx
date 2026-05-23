@@ -111,7 +111,7 @@ export default async function ProductPage({ params }: Props) {
                 />
               </div>
 
-              <div className="space-y-5 lg:sticky lg:top-24 xl:top-28">
+              <div className="space-y-5">
                 <div
                   id="pdp-headline-anchor"
                   className="scroll-mt-[6rem] space-y-4 text-right"
