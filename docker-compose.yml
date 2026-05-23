@@ -55,7 +55,10 @@ services:
   #   ports: "3000:80" و environment PORT: "80"
   # وإلا يبقى compose على 3000:3000 مع PORT: "3000" (الافتراضي في Dockerfile).
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        BACKEND_INTERNAL_URL: http://backend:8000
     image: ghcr.io/talebberrouanebenyagoub577-dotcom/bob-frontend:latest
     container_name: nidhamauto_frontend
     restart: unless-stopped

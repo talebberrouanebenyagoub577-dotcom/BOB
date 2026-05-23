@@ -68,7 +68,7 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "NEXT_PUBLIC_API_URL=https://api.$(EASYPANEL_DOMAIN)\nNEXT_PUBLIC_ENABLE_PIXELS=true\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
+        "env": "BACKEND_INTERNAL_URL=http://organisat_backend:8000\nNEXT_PUBLIC_API_URL=https://api.$(EASYPANEL_DOMAIN)\nNEXT_PUBLIC_ENABLE_PIXELS=true\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
         "domains": [
           {
             "host": "$(EASYPANEL_DOMAIN)",

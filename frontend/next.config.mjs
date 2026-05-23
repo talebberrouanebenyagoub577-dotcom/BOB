@@ -20,8 +20,12 @@ const nextConfig = {
   },
 
   async rewrites() {
-    /** بدون Docker: شغّل FastAPI محلياً (:8000). في Docker يُعدَّل عبر BACKEND_INTERNAL_URL */
-    const backendUrl = process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000";
+    /** EasyPanel/Swarm: organisat_backend. Compose: backend. Local dev: 127.0.0.1 */
+    const backendUrl =
+      process.env.BACKEND_INTERNAL_URL?.trim() ||
+      (process.env.NODE_ENV === "production"
+        ? "http://organisat_backend:8000"
+        : "http://127.0.0.1:8000");
     return [
       {
         source: "/api/:path*",
