@@ -2,7 +2,7 @@ import { PRODUCTS } from "../data/products";
 import { useCart } from "../store/cartStore";
 
 export default function ProductGrid() {
-  const { addToCart } = useCart();
+  const { buyNow } = useCart();
 
   return (
     <section id="shop" className="product-section">
@@ -16,7 +16,7 @@ export default function ProductGrid() {
               <strong>{product.price} SAR</strong>
               <button
                 type="button"
-                onClick={() => addToCart(product.id)}
+                onClick={() => buyNow(product.id)}
                 className="primary-btn"
               >
                 اطلب الآن - الدفع عند الاستلام

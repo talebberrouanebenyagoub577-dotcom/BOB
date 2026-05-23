@@ -62,7 +62,7 @@ function FaqItem({ q, a }) {
 }
 
 export default function HomePage() {
-  const { addToCart } = useCart();
+  const { buyNow } = useCart();
 
   return (
     <>
@@ -173,7 +173,7 @@ export default function HomePage() {
                   <div className="product-cta" style={{ display: "flex", gap: 8, marginTop: 4 }}>
                     <button
                       className="btn btn-gold btn-full"
-                      onClick={() => addToCart(p.id)}
+                      onClick={() => buyNow(p.id)}
                       type="button"
                     >
                       اشتري الآن

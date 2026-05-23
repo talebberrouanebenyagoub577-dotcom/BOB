@@ -10,8 +10,6 @@ import { Header } from "@/components/Header";
 
 import { Footer } from "@/components/Footer";
 
-import { CartDrawer } from "@/components/CartDrawer";
-
 import { CheckoutPopup } from "@/components/CheckoutPopup";
 
 import { UpsellModal } from "@/components/UpsellModal";
@@ -331,8 +329,6 @@ export default function ThankYouPage() {
   return (
     <>
       <Header />
-
-      <CartDrawer />
 
       <CheckoutPopup />
 

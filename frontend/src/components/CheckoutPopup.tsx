@@ -63,7 +63,7 @@ export function CheckoutPopup() {
   async function submitOrder(upsellAccepted: boolean) {
     const raw = sessionStorage.getItem("pending_order");
     if (!raw) {
-      setError("لم نجد بيانات الطلب. أعد فتح السلة وحاول مرة أخرى.");
+      setError("لم نجد بيانات الطلب. أعد فتح نموذج الطلب وحاول مرة أخرى.");
       setLoading(false);
       return;
     }

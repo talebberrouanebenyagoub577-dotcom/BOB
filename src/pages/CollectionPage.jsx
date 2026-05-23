@@ -15,7 +15,7 @@ function StarRow({ count = 5 }) {
 }
 
 export default function CollectionPage() {
-  const { addToCart } = useCart();
+  const { buyNow } = useCart();
   const [descExpanded, setDescExpanded] = useState(() => ({}));
 
   const toggleDesc = (id) => {
@@ -105,7 +105,7 @@ export default function CollectionPage() {
                   <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                     <button
                       className="btn btn-gold btn-full"
-                      onClick={() => addToCart(p.id)}
+                      onClick={() => buyNow(p.id)}
                       type="button"
                     >
                       اشتري الآن — الدفع عند الاستلام

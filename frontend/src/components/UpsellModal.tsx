@@ -41,7 +41,7 @@ export function UpsellModal() {
     setError("");
     const raw = sessionStorage.getItem("pending_order");
     if (!raw) {
-      setError("لم نجد بيانات الطلب. غادر أو أعد المحاولة من السلة.");
+      setError("لم نجد بيانات الطلب. غادري أو أعيدي المحاولة من صفحة المنتج.");
       return;
     }
 
@@ -55,7 +55,7 @@ export function UpsellModal() {
     try {
       pending = JSON.parse(raw) as typeof pending;
     } catch {
-      setError("بيانات الطلب تالفة. أعد المحاولة من السلة.");
+      setError("بيانات الطلب تالفة. أعيدي المحاولة من صفحة المنتج.");
       return;
     }
     const upsellDelta = accepted && upsellProduct ? UPSELL_PRICE : 0;

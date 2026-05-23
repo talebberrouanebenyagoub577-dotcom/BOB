@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CartDrawer } from "@/components/CartDrawer";
 import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { OfferSelector } from "@/components/OfferSelector";
@@ -87,7 +86,6 @@ export default async function ProductPage({ params }: Props) {
     <>
       <ProductViewTracker sku={product.sku} productId={product.id} />
       <Header />
-      <CartDrawer />
       <CheckoutPopup />
       <UpsellModal />
 

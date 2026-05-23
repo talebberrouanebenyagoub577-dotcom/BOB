@@ -105,7 +105,7 @@ export default function ThankYouPage({ order, onContinueShopping }) {
           </p>
 
           <p style={{ fontSize: 13, color: "var(--gray-600)", textAlign: "center", marginTop: 16 }}>
-            تم إفراغ سلة التسوق بعد تأكيد الطلب — يمكنك متابعة التسوق في أي وقت.
+            تم تأكيد طلبك — يمكنك متابعة التسوق في أي وقت.
           </p>
 
           <Link

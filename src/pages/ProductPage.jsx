@@ -39,7 +39,7 @@ function FaqItem({ q, a }) {
 export default function ProductPage() {
   const { id } = useParams();
   const product = PRODUCTS.find((p) => p.id === id);
-  const { addToCart, isCheckoutOpen } = useCart();
+  const { buyNow, isCheckoutOpen } = useCart();
   const [selectedQty, setSelectedQty] = useState(1);
 
   if (!product) return <Navigate to="/collection" replace />;
@@ -51,9 +51,7 @@ export default function ProductPage() {
   const detailHeroSrc = getProductPageHeroUrl(product.id);
 
   const handleBuy = () => {
-    for (let i = 0; i < selectedQty; i++) {
-      addToCart(product.id);
-    }
+    buyNow(product.id, selectedQty);
   };
 
   return (
@@ -265,7 +263,7 @@ export default function ProductPage() {
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
                       {!isCheckoutOpen && (
-                        <button className="btn btn-gold btn-full" onClick={() => addToCart(cp.id)} type="button">
+                        <button className="btn btn-gold btn-full" onClick={() => buyNow(cp.id)} type="button">
                           اشتري الآن
                         </button>
                       )}

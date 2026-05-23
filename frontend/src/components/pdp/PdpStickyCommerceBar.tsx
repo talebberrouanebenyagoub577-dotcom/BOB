@@ -23,7 +23,7 @@ interface StickyBarProps {
 
 export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
   const { product, qty, setQty } = usePdpQty();
-  const { addItem, openCheckout, isCheckoutOpen, isDrawerOpen, isUpsellOpen } =
+  const { addItem, openCheckout, isCheckoutOpen, isUpsellOpen } =
     useCartStore();
   const barRef = useRef<HTMLElement>(null);
 
@@ -49,8 +49,8 @@ export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
 
   const price = getTierPrice(qty);
 
-  /* لا يُعرض فوق نافذة التحقّق أو السلة أو العرض الإضافي (نفس طبقة z تقريباً) */
-  if (!showWhenBuyHidden || isCheckoutOpen || isDrawerOpen || isUpsellOpen)
+  /* لا يُعرض فوق نافذة التحقّق أو العرض الإضافي (نفس طبقة z تقريباً) */
+  if (!showWhenBuyHidden || isCheckoutOpen || isUpsellOpen)
     return null;
 
   return (
@@ -62,7 +62,7 @@ export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
         "px-4 py-3 md:py-3.5"
       )}
       role="contentinfo"
-      aria-label="إضافة سريعة وعرض الأسعار"
+      aria-label="شراء سريع وعرض الأسعار"
     >
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
         <div className="flex gap-2 flex-1 overflow-x-auto md:justify-center pb-1 md:pb-0">
@@ -96,7 +96,7 @@ export function PdpStickyCommerceBar({ showWhenBuyHidden }: StickyBarProps) {
             </p>
           </div>
           <button type="button" onClick={handleBuy} className="btn-gold text-base md:text-lg py-4 px-6 md:py-4 md:px-8 whitespace-nowrap">
-            إضافة للسلة
+            اشتري الآن
           </button>
         </div>
       </div>

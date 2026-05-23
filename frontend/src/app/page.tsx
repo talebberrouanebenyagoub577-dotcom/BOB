@@ -1,7 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { CartDrawer } from "@/components/CartDrawer";
 import { CheckoutPopup } from "@/components/CheckoutPopup";
 import { UpsellModal } from "@/components/UpsellModal";
 import { HeroTrackLinks } from "@/components/HeroTrackLinks";
@@ -46,7 +45,6 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <CartDrawer />
       <CheckoutPopup />
       <UpsellModal />
 

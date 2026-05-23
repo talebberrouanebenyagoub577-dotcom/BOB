@@ -7,7 +7,6 @@ import { submitFinalOrder } from "./lib/orderApi";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import CartDrawer from "./components/CartDrawer";
 import CheckoutPopup from "./components/CheckoutPopup";
 import UpsellOfferModal from "./components/UpsellOfferModal";
 import ThankYouPage from "./components/ThankYouPage";
@@ -43,7 +42,7 @@ function ScrollToTop() {
 }
 
 function Storefront() {
-  const { clearCart, closeCheckout, closeDrawer } = useCart();
+  const { clearCart, closeCheckout } = useCart();
   const upsellPrice = getUpsellPrice();
 
   const [checkoutPayload, setCheckoutPayload] = useState(null);
@@ -123,7 +122,6 @@ function Storefront() {
     if (candidate && !upsellSeen) {
       localStorage.setItem(UPSELL_KEY, "1");
       closeCheckout();
-      closeDrawer();
       setUpsellOffer(candidate);
       setIsUpsellOpen(true);
       return;
@@ -158,7 +156,6 @@ function Storefront() {
       <Footer />
 
       {/* Global overlays */}
-      <CartDrawer />
       <CheckoutPopup onOrderConfirmed={handleOrderConfirmed} />
       <UpsellOfferModal
         isOpen={isUpsellOpen}

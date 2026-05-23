@@ -76,7 +76,7 @@ export function OfferSelector({ product }: Props) {
           </div>
 
           <button type="button" onClick={handleBuy} className="btn-gold w-full text-xl py-5 md:py-5">
-            إضافة للسلة — الدفع عند الاستلام
+            اشتري الآن — الدفع عند الاستلام
           </button>
         </>
       )}
