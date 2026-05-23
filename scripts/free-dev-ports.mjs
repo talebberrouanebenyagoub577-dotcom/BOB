@@ -3,13 +3,19 @@
  *
  * Usage:
  *   node scripts/free-dev-ports.mjs          → 5173, 8787 (default — safe when Docker uses :8000)
- *   node scripts/free-dev-ports.mjs all      → also 8000 (local uvicorn/docker conflict cleanup)
+ *   node scripts/free-dev-ports.mjs next     → 3000 (Next.js frontend dev)
  */
 import { spawnSync } from "node:child_process";
 
 const mode = (process.argv[2] || "storefront").toLowerCase();
 const STOREFRONT_PORTS = [5173, 8787];
-const PORTS = mode === "all" ? [...STOREFRONT_PORTS, 8000] : STOREFRONT_PORTS;
+const NEXT_PORTS = [3000];
+const PORTS =
+  mode === "all"
+    ? [...STOREFRONT_PORTS, 8000]
+    : mode === "next"
+      ? NEXT_PORTS
+      : STOREFRONT_PORTS;
 
 function freeWindows() {
   for (const port of PORTS) {

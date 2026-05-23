@@ -16,6 +16,10 @@
     "dev:web": "vite --host 0.0.0.0",
     "dev:api": "node server/index.js",
     "dev:backend": "node backend/scripts/start-backend.mjs",
+    "predev:next": "node scripts/free-dev-ports.mjs next",
+    "dev:next": "npm run dev --prefix frontend",
+    "dev:next:full": "concurrently -n next,express,fastapi \"npm:dev:next\" \"npm:dev:api\" \"npm:dev:backend\"",
+    "build:next": "npm run build --prefix frontend",
     "build": "vite build",
     "preview": "vite preview"
   },
