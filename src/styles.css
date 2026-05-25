@@ -1010,7 +1010,15 @@ img { display: block; max-width: 100%; }
     max-height: 520px;
   }
 }
-.pdp-zigzag-text { flex: 1; text-align: right; }
+.pdp-zigzag-text {
+  flex: 1;
+  text-align: right;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(11, 22, 40, 0.1);
+  background: linear-gradient(135deg, #fff 0%, #fff 55%, rgba(11, 22, 40, 0.04) 100%);
+  box-shadow: 0 12px 40px rgba(11, 22, 40, 0.1);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
 .pdp-zigzag-heading {
   font-size: clamp(1.15rem, 2vw, 1.5rem);
   font-weight: 800;

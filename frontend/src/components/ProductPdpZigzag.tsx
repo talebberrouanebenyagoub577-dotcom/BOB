@@ -53,13 +53,15 @@ export function ProductPdpZigzag({
                 />
               </div>
             </div>
-            <div className="w-full lg:flex-1 text-right flex flex-col justify-center space-y-4 md:space-y-5">
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-navy leading-snug">
-                {b.title}
-              </h3>
-              <p className="text-navy/78 leading-relaxed text-base md:text-xl max-w-xl lg:max-w-none">
-                {b.body}
-              </p>
+            <div className="w-full lg:flex-1 flex flex-col justify-center">
+              <div className="text-right rounded-2xl border border-navy/10 bg-gradient-to-br from-white via-white to-navy/[0.05] shadow-xl ring-1 ring-navy/10 p-6 sm:p-7 md:p-8 space-y-4 md:space-y-5 h-full">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-navy leading-snug">
+                  {b.title}
+                </h3>
+                <p className="text-navy/78 leading-relaxed text-base md:text-xl max-w-xl lg:max-w-none">
+                  {b.body}
+                </p>
+              </div>
             </div>
           </article>
         ))}
