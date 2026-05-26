@@ -39,5 +39,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
+# Swarm/Traefik must reach the app on 0.0.0.0 — default hostname bind breaks routing (502).
+ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 CMD ["node", "server.js"]

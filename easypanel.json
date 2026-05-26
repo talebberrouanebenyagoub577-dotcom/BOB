@@ -3,16 +3,16 @@
     {
       "type": "postgres",
       "data": {
-        "projectName": "$(PROJECT_NAME)",
+        "projectName": "nidhamauto",
         "serviceName": "db",
-        "image": "postgres:16-alpine",
+        "image": "postgres:17-alpine",
         "password": "$(DB_PASSWORD)"
       }
     },
     {
       "type": "app",
       "data": {
-        "projectName": "$(PROJECT_NAME)",
+        "projectName": "nidhamauto",
         "serviceName": "backend",
         "source": {
           "type": "github",
@@ -25,10 +25,10 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "DATABASE_URL=postgresql+asyncpg://nidhamauto:$(DB_PASSWORD)@db:5432/nidhamauto\nSECRET_KEY=$(SECRET_KEY)\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nMETA_TEST_EVENT_CODE=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=\nGOOGLE_SHEET_WEBHOOK=",
+        "env": "POSTGRES_HOST=nidhamauto_db\nPOSTGRES_USER=nidhamauto\nPOSTGRES_PASSWORD=$(DB_PASSWORD)\nPOSTGRES_DB=nidhamauto\nPOSTGRES_PORT=5432\nFRONTEND_URL=https://nidhamauto.shop\nSECRET_KEY=$(SECRET_KEY)\nADMIN_USERNAME=$(ADMIN_USERNAME)\nADMIN_PASSWORD=$(ADMIN_PASSWORD)\nGOOGLE_SHEETS_WEBHOOK_URL=\nWHITELISTED_PHONES=+966550603\nMETA_ACCESS_TOKEN=\nMETA_PIXEL_ID=\nTIKTOK_ACCESS_TOKEN=\nTIKTOK_PIXEL_ID=\nSNAP_ACCESS_TOKEN=\nSNAP_PIXEL_ID=",
         "domains": [
           {
-            "host": "api.$(EASYPANEL_DOMAIN)",
+            "host": "api.nidhamauto.shop",
             "port": 8000
           }
         ]
@@ -37,25 +37,7 @@
     {
       "type": "app",
       "data": {
-        "projectName": "$(PROJECT_NAME)",
-        "serviceName": "pgweb",
-        "source": {
-          "type": "image",
-          "image": "sosedoff/pgweb"
-        },
-        "env": "DATABASE_URL=postgres://nidhamauto:$(DB_PASSWORD)@db:5432/nidhamauto?sslmode=disable",
-        "domains": [
-          {
-            "host": "pgweb.$(EASYPANEL_DOMAIN)",
-            "port": 8081
-          }
-        ]
-      }
-    },
-    {
-      "type": "app",
-      "data": {
-        "projectName": "$(PROJECT_NAME)",
+        "projectName": "nidhamauto",
         "serviceName": "frontend",
         "source": {
           "type": "github",
@@ -68,10 +50,10 @@
           "type": "dockerfile",
           "dockerfilePath": "./Dockerfile"
         },
-        "env": "BACKEND_INTERNAL_URL=http://organisat_backend:8000\nNEXT_PUBLIC_API_URL=https://api.$(EASYPANEL_DOMAIN)\nNEXT_PUBLIC_ENABLE_PIXELS=true\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
+        "env": "HOSTNAME=0.0.0.0\nPORT=3000\nBACKEND_INTERNAL_URL=http://nidhamauto_backend:8000\nNEXT_PUBLIC_API_URL=https://api.nidhamauto.shop\nNEXT_PUBLIC_ENABLE_PIXELS=true\nNEXT_PUBLIC_META_PIXEL_ID=\nNEXT_PUBLIC_TIKTOK_PIXEL_ID=\nNEXT_PUBLIC_SNAP_PIXEL_ID=",
         "domains": [
           {
-            "host": "$(EASYPANEL_DOMAIN)",
+            "host": "nidhamauto.shop",
             "port": 3000
           }
         ]
