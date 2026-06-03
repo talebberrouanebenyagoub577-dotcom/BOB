@@ -1,7 +1,6 @@
 """Google Sheets webhook — retries up to 2 times, never blocks order."""
 import asyncio
 import logging
-from urllib.parse import urljoin
 
 import httpx
 
@@ -9,28 +8,16 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Google Apps Script `/exec` almost always responds with HTTP 302 to script.googleusercontent.com.
-# Many HTTP clients (including httpx with follow_redirects=True) replay that redirect as GET,
-# which runs doGet() only — no row is appended. Follow redirects manually while keeping POST + JSON.
-_MAX_REDIRECT_HOPS = 8
+# Google Apps Script `/exec` runs doPost() on the initial POST, then responds with HTTP 302
+# to a googleusercontent.com URL that only accepts GET. Following the redirect with POST
+# yields 405; following with GET runs doGet() instead — neither appends a row.
+_APPS_SCRIPT_REDIRECT_CODES = frozenset({301, 302, 303, 307, 308})
 
 
 async def _post_apps_script_webhook(
     client: httpx.AsyncClient, start_url: str, payload: dict
 ) -> httpx.Response:
-    current = start_url.strip()
-    response: httpx.Response | None = None
-    for _ in range(_MAX_REDIRECT_HOPS):
-        response = await client.post(current, json=payload, follow_redirects=False)
-        if response.status_code in (301, 302, 307, 308):
-            loc = response.headers.get("location")
-            if not loc:
-                break
-            current = loc if loc.startswith("http") else urljoin(str(response.url), loc)
-            continue
-        break
-    assert response is not None
-    return response
+    return await client.post(start_url.strip(), json=payload, follow_redirects=False)
 
 
 async def send_to_sheets(payload: dict) -> None:
@@ -46,6 +33,13 @@ async def send_to_sheets(payload: dict) -> None:
         try:
             async with httpx.AsyncClient() as client:
                 r = await _post_apps_script_webhook(client, url, payload)
+                if r.status_code in _APPS_SCRIPT_REDIRECT_CODES:
+                    logger.info(
+                        "Sheets webhook accepted (Apps Script %d after doPost) for order %s",
+                        r.status_code,
+                        payload.get("orderid"),
+                    )
+                    return
                 r.raise_for_status()
                 try:
                     data = r.json()
