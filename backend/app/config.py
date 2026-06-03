@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=_BACKEND_ENV, env_file_encoding="utf-8", extra="ignore")
 
     # Full URL when POSTGRES_PASSWORD is empty (legacy / advanced).
-    DATABASE_URL: str = "postgresql+asyncpg://nidhamauto:nidhamauto@db:5432/nidhamauto"
+    # Default is empty so a missing .env fails fast instead of silently using weak creds.
+    DATABASE_URL: str = ""
 
     # Preferred: set POSTGRES_PASSWORD raw in .env — proper URL encoding (@, :, etc.) applied automatically.
     POSTGRES_USER: str = "nidhamauto"
@@ -78,8 +79,11 @@ class Settings(BaseSettings):
             h = self.POSTGRES_HOST.strip()
             db = self.POSTGRES_DB.strip()
             port = int(self.POSTGRES_PORT)
-            assembled = f"postgresql+asyncpg://{u}:{p}@{h}:{port}/{db}"
-            return self.model_copy(update={"DATABASE_URL": assembled})
+            # Mutate self directly: in pydantic-settings, returning model_copy(update=...)
+            # from mode="after" validators is sometimes silently dropped.
+            object.__setattr__(
+                self, "DATABASE_URL", f"postgresql+asyncpg://{u}:{p}@{h}:{port}/{db}"
+            )
         return self
 
     @field_validator("TRAFFIC_TRUST_PRIVATE_IP", mode="before")

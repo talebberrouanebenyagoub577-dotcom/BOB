@@ -4,13 +4,12 @@ services:
     container_name: nidhamauto_database
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-nidhamauto}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nidhamauto}
-      POSTGRES_DB: ${POSTGRES_DB:-nidhamauto}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (NEVER default to a weak value)}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
     volumes:
       - pg_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks: [internal]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" || exit 1"]
       interval: 5s
@@ -24,16 +23,13 @@ services:
     restart: unless-stopped
     env_file: ./backend/.env
     environment:
-      # داخل Docker شبكة Postgres اسمها "db"; التطوير على المضيف يستخدم 127.0.0.1 في .env.
       POSTGRES_HOST: db
-      # يجب مطابقة كلمة مرور مستخدم قاعدة البيانات مع خدمة db (نفس ${POSTGRES_PASSWORD} في جذر المشروع).
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nidhamauto}
-      POSTGRES_USER: ${POSTGRES_USER:-nidhamauto}
-      POSTGRES_DB: ${POSTGRES_DB:-nidhamauto}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:?}
       POSTGRES_PORT: "5432"
-      GOOGLE_SHEETS_WEBHOOK_URL: https://script.google.com/macros/s/AKfycbysfd_ZhAEcpxUK0KbHoStIHqFM39UZiSNkPd492TI1Ca6hGej3yz07A03APoaXFDGH/exec
-    ports:
-      - "8000:8000"
+      GOOGLE_SHEETS_WEBHOOK_URL: ${GOOGLE_SHEETS_WEBHOOK_URL:?set GOOGLE_SHEETS_WEBHOOK_URL in .env}
+    networks: [internal, web]
     healthcheck:
       test:
         [
@@ -46,14 +42,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 25s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bob-api.rule=Host(`api.nidhamauto.shop`)"
+      - "traefik.http.routers.bob-api.entrypoints=websecure"
+      - "traefik.http.routers.bob-api.tls.certresolver=le"
+      - "traefik.http.services.bob-api.loadbalancer.server.port=8000"
     depends_on:
       db:
         condition: service_healthy
 
-  # Next يطبع "Local: http://HOSTNAME:PORT" — HOSTNAME هو اسم الحاوية وليس دومين الموقع.
-  # إذا ظهر لك :80 داخل اللوج فـ Next يستمع على 80؛ يجب مطابقة المنفذ يميناً مع نفس الرقم:
-  #   ports: "3000:80" و environment PORT: "80"
-  # وإلا يبقى compose على 3000:3000 مع PORT: "3000" (الافتراضي في Dockerfile).
   frontend:
     build:
       context: ./frontend
@@ -64,26 +62,35 @@ services:
     restart: unless-stopped
     env_file: ./frontend/.env
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.nidhamauto.shop}
       BACKEND_INTERNAL_URL: http://backend:8000
       PORT: ${FRONTEND_INTERNAL_PORT:-3000}
-    ports:
-      - "${FRONTEND_PUBLISH_PORT:-3000}:${FRONTEND_INTERNAL_PORT:-3000}"
+    networks: [web]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bob-web.rule=Host(`nidhamauto.shop`) || Host(`www.nidhamauto.shop`)"
+      - "traefik.http.routers.bob-web.entrypoints=websecure"
+      - "traefik.http.routers.bob-web.tls.certresolver=le"
+      - "traefik.http.services.bob-web.loadbalancer.server.port=${FRONTEND_INTERNAL_PORT:-3000}"
     depends_on:
       backend:
         condition: service_healthy
 
-  pgweb:
-    image: sosedoff/pgweb
-    container_name: nidhamauto_pgweb
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-nidhamauto}:${POSTGRES_PASSWORD:-nidhamauto}@db:5432/${POSTGRES_DB:-nidhamauto}?sslmode=disable
-    depends_on:
-      db:
-        condition: service_healthy
+# pgweb removed from production stack.
+# To access the DB ad-hoc (from your laptop):
+#   ssh -L 8081:127.0.0.1:8081 root@<vps>
+#   docker run --rm -d --name pgweb_tmp --network bob_internal \
+#     -p 127.0.0.1:8081:8081 \
+#     -e DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable" \
+#     sosedoff/pgweb
+#   open http://localhost:8081  # only reachable through the tunnel
+#   docker rm -f pgweb_tmp  # tear down when done
+
+networks:
+  internal:
+    driver: bridge
+  web:
+    driver: bridge
 
 volumes:
   pg_data:
