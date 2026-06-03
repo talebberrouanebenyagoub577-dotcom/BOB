@@ -44,6 +44,25 @@ async def _ensure_queue_row(order_id: str, payload: dict) -> SheetSyncQueue | No
         return row
 
 
+async def _claim_for_delivery(order_id: str) -> SheetSyncQueue | None:
+    """Atomically claim a pending row so enqueue and the worker never deliver twice."""
+    async with AsyncSessionLocal() as db:
+        row = await db.scalar(
+            select(SheetSyncQueue)
+            .where(
+                SheetSyncQueue.order_id == order_id,
+                SheetSyncQueue.status == "pending",
+            )
+            .with_for_update(skip_locked=True)
+        )
+        if row is None:
+            return None
+        row.status = "processing"
+        await db.commit()
+        await db.refresh(row)
+        return row
+
+
 async def _mark_sent(order_id: str) -> None:
     async with AsyncSessionLocal() as db:
         await db.execute(
@@ -92,6 +111,11 @@ async def enqueue_sheet_sync(payload: dict) -> None:
     if row is None:
         return
 
+    claimed = await _claim_for_delivery(order_id)
+    if claimed is None:
+        logger.info("Sheet sync delivery already in progress for order %s", order_id)
+        return
+
     ok, err, body = await deliver_sheet_row(payload)
     if ok:
         await _mark_sent(order_id)
@@ -113,20 +137,26 @@ async def drain_pending_sheet_sync(limit: int = WORKER_BATCH_SIZE) -> int:
                 )
                 .order_by(SheetSyncQueue.next_retry_at)
                 .limit(limit)
+                .with_for_update(skip_locked=True)
             )
         ).all()
+        for row in rows:
+            row.status = "processing"
+        await db.commit()
+        # Detach payloads before session closes
+        work = [(r.order_id, dict(r.payload)) for r in rows]
 
-    if not rows:
+    if not work:
         return 0
 
-    logger.info("Sheet sync worker processing %d pending row(s)", len(rows))
+    logger.info("Sheet sync worker processing %d pending row(s)", len(work))
     processed = 0
-    for row in rows:
-        ok, err, body = await deliver_sheet_row(row.payload)
+    for order_id, payload in work:
+        ok, err, body = await deliver_sheet_row(payload)
         if ok:
-            await _mark_sent(row.order_id)
+            await _mark_sent(order_id)
         else:
-            await _record_failure(row.order_id, err, body, attempts_added=len(RETRY_DELAYS_SEC))
+            await _record_failure(order_id, err, body, attempts_added=len(RETRY_DELAYS_SEC))
         processed += 1
     return processed
 
