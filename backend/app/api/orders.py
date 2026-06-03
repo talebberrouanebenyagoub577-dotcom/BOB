@@ -12,7 +12,7 @@ from app.database import get_db
 from app.models.order import Order, OrderItem
 from app.schemas.order import OrderIn, OrderOut
 from app.services.tracking import fire_all_capi
-from app.services.webhook import send_to_sheets
+from app.services.sheet_sync import enqueue_sheet_sync
 from app.services.geo import is_saudi_ip
 from app.services.traffic_intel import classify_visitor_ip
 from app.deps.admin_auth import verify_admin
@@ -128,7 +128,7 @@ async def create_order(
     }
 
     # Fire background tasks — never block response
-    background_tasks.add_task(send_to_sheets, sheet_payload)
+    background_tasks.add_task(enqueue_sheet_sync, sheet_payload)
     background_tasks.add_task(
         fire_all_capi,
         body.event_id,

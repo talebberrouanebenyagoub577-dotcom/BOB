@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from fastapi import FastAPI
@@ -15,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Nidha Mauto API", version="1.0.0")
 
+_sheet_sync_stop = asyncio.Event()
+_sheet_sync_task: asyncio.Task | None = None
+
 _cors_origins = ["https://nidhamauto.shop", "http://localhost:3000", "http://localhost:5173"]
 _fu = settings.FRONTEND_URL.rstrip("/") if settings.FRONTEND_URL else ""
 if _fu and _fu not in _cors_origins:
@@ -31,10 +35,12 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup() -> None:
     """Auto-run migrations on startup."""
-    from app.config import settings
+    global _sheet_sync_task
     from sqlalchemy import text
 
+    from app.models.sheet_sync import SheetSyncQueue  # noqa: F401
     from app.models.tracking import TrackingEvent  # noqa: F401
+    from app.services.sheet_sync import sheet_sync_worker, startup_sheet_sync
 
     has_piecemeal_pw = bool((settings.POSTGRES_PASSWORD or "").strip())
     if has_piecemeal_pw:
@@ -94,6 +100,26 @@ async def startup() -> None:
         logger.info("Admin-related routes registered: %s", admin_paths)
     except Exception as e:
         logger.warning("Could not introspect routes: %s", e)
+
+    try:
+        await startup_sheet_sync()
+        _sheet_sync_stop.clear()
+        _sheet_sync_task = asyncio.create_task(sheet_sync_worker(_sheet_sync_stop))
+    except Exception as e:
+        logger.error("Sheet sync worker failed to start: %s", e)
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    global _sheet_sync_task
+    _sheet_sync_stop.set()
+    if _sheet_sync_task is not None:
+        _sheet_sync_task.cancel()
+        try:
+            await _sheet_sync_task
+        except asyncio.CancelledError:
+            pass
+        _sheet_sync_task = None
 
 
 @app.get("/", include_in_schema=False)
